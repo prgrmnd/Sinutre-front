@@ -1,4 +1,5 @@
 import { useState, FormEvent } from 'react';
+import { updateProfile } from '@/services/userService';
 
 interface UpdateProfileModalProps {
   isOpen: boolean;
@@ -29,12 +30,12 @@ export function UpdateProfileModal({ isOpen, onClose }: UpdateProfileModalProps)
     try {
       console.log('Dados sendo enviados:', payload);
       
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await updateProfile(payload);
       
       onClose();
     } catch (err) {
       console.error(err);
-      setError('Ocorreu um erro ao salvar os dados. Tente novamente.');
+      setError('Ocorreu um erro ao salvar os dados. Verifique as informações e tente novamente.');
     } finally {
       setIsLoading(false);
     }
