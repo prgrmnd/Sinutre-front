@@ -8,5 +8,5 @@ interface UpdateProfilePayload {
 
 export async function updateProfile(data: UpdateProfilePayload) {
 
-  return api.put('/me', data);
+  return api.patch('/auth/me', data);
 }
