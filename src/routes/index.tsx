@@ -9,6 +9,7 @@ import { LoginPage } from '@/pages/LoginPage';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { ProtectedRoute } from './ProtectRoute';
 import { DietFoodPage } from '@/pages/DietFood';
+import { SettingsPage } from '@/pages/SettingsPage';
 
 export function Router() {
   return (
@@ -51,6 +52,19 @@ export function Router() {
             }
           />
 
+        </Route>
+
+        <Route
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route
+            path="/settings"
+            element={<SettingsPage />}
+          />
         </Route>
 
       </Routes>
