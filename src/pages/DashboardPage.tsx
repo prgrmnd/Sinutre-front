@@ -108,7 +108,7 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
         fats: 0,
         calories: 0,
 
-        caloriesGoal: 1000, //ainda não veio do banco de dados
+        caloriesGoal: 1000,
       },
     );
   }, [meals]);
