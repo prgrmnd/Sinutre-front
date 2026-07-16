@@ -1,16 +1,20 @@
 import { useEffect, useState } from 'react';
-import { Plus, Trash } from '@phosphor-icons/react';
+import { Plus, Trash, PencilSimple } from '@phosphor-icons/react';
 import { SimpleHeader } from '@/components/layout/SimpleHeader';
 import { AddFoodModal } from '@/components/modal/AddFoodModal';
+import { UpdateFoodModal } from '@/components/modal/UpdateFoodModal'; 
 import { getFoods } from '@/services/foodService';
 import type { Food } from '@/types/food';
 import { api } from '@/lib/api';
 
 const MODAL_ID = 'create-food-modal';
+const UPDATE_MODAL_ID = 'update-food-modal';
 
 export function DietFoodPage() {
   const [foods, setFoods] = useState<Food[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  const [foodToEdit, setFoodToEdit] = useState<Food | null>(null);
 
   async function loadFoods() {
     try {
@@ -31,13 +35,16 @@ export function DietFoodPage() {
 
     try {
       await api.delete(`/foods/${id}`);
-      
       setFoods((prevFoods) => prevFoods.filter((food) => food.id !== id));
-      
     } catch (error) {
       console.error('Erro ao excluir alimento:', error);
       alert('Não foi possível excluir o alimento. Tente novamente.');
     }
+  }
+
+  function openUpdateModal(food: Food) {
+    setFoodToEdit(food); 
+    (document.getElementById(UPDATE_MODAL_ID) as HTMLDialogElement)?.showModal();
   }
 
   return (
@@ -57,37 +64,35 @@ export function DietFoodPage() {
               className="card bg-base-100 shadow-sm"
             >
               <div className="card-body">
-                
                 <div className="flex justify-between items-start mb-2">
                   <h2 className="card-title m-0">
                     {food.name}
                   </h2>
                   
-                  <button
-                    onClick={() => handleDeleteFood(food.id)}
-                    className="btn btn-ghost btn-circle btn-sm text-error hover:bg-error/10"
-                    title="Excluir alimento"
-                  >
-                    <Trash size={20} weight="bold" />
-                  </button>
+                  <div className="flex flex-col gap-2 ml-4">
+                    <button
+                      onClick={() => openUpdateModal(food)}
+                      className="btn btn-ghost btn-circle btn-sm text-info hover:bg-info/10"
+                      title="Atualizar alimento"
+                    >
+                      <PencilSimple size={20} weight="bold" />
+                    </button>
+
+                    <button
+                      onClick={() => handleDeleteFood(food.id)}
+                      className="btn btn-ghost btn-circle btn-sm text-error hover:bg-error/10"
+                      title="Excluir alimento"
+                    >
+                      <Trash size={20} weight="bold" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-                  <span>
-                    🔥 {food.caloriesPer100g} kcal
-                  </span>
-
-                  <span>
-                    🍞 {food.carbsPer100g} g
-                  </span>
-
-                  <span>
-                    🍗 {food.proteinPer100g} g
-                  </span>
-
-                  <span>
-                    🥑 {food.fatPer100g} g
-                  </span>
+                  <span>🔥 {food.caloriesPer100g} kcal</span>
+                  <span>🍞 {food.carbsPer100g} g</span>
+                  <span>🍗 {food.proteinPer100g} g</span>
+                  <span>🥑 {food.fatPer100g} g</span>
                 </div>
               </div>
             </div>
@@ -98,11 +103,7 @@ export function DietFoodPage() {
       <button
         className="btn btn-primary btn-circle btn-lg fixed bottom-6 right-6 shadow-lg z-50"
         onClick={() =>
-          (
-            document.getElementById(
-              MODAL_ID,
-            ) as HTMLDialogElement
-          )?.showModal()
+          (document.getElementById(MODAL_ID) as HTMLDialogElement)?.showModal()
         }
       >
         <Plus size={24} weight="bold" />
@@ -111,6 +112,12 @@ export function DietFoodPage() {
       <AddFoodModal
         modalId={MODAL_ID}
         onCreated={loadFoods}
+      />
+      
+      <UpdateFoodModal
+        modalId={UPDATE_MODAL_ID}
+        food={foodToEdit}
+        onUpdated={loadFoods}
       />
     </div>
   );
