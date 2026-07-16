@@ -2,13 +2,13 @@ import { useEffect, useState, FormEvent } from 'react';
 import { api } from '@/lib/api';
 import type { Food } from '@/types/food';
 
-interface EditFoodModalProps {
+interface UpdateFoodModalProps {
   modalId: string;
   food: Food | null;
   onUpdated: () => void;
 }
 
-export function EditFoodModal({ modalId, food, onUpdated }: EditFoodModalProps) {
+export function UpdateFoodModal({ modalId, food, onUpdated }: UpdateFoodModalProps) {
   const [name, setName] = useState('');
   const [calories, setCalories] = useState<number | ''>('');
   const [carbs, setCarbs] = useState<number | ''>('');
@@ -44,7 +44,7 @@ export function EditFoodModal({ modalId, food, onUpdated }: EditFoodModalProps) 
         fatPer100g: Number(fat),
       });
       
-      onUpdated(); 
+      onUpdated();
       closeModal();
     } catch (error) {
       console.error('Erro ao atualizar alimento:', error);
@@ -61,7 +61,7 @@ export function EditFoodModal({ modalId, food, onUpdated }: EditFoodModalProps) 
           <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
         </form>
         
-        <h3 className="font-bold text-lg mb-4">Editar Alimento</h3>
+        <h3 className="font-bold text-lg mb-4">Atualizar Alimento</h3>
         
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="form-control">
