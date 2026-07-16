@@ -1,15 +1,34 @@
-//import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { SignOut } from '@phosphor-icons/react';
 import { NAV_ITEMS } from '@/constants/navigation';
 import { SidebarBrand } from './SidebarBrand';
 import { SidebarItem } from './SidebarItem';
+import { api } from '@/lib/api';
 
 interface SidebarProps {
   drawerId: string;
 }
 
 export function Sidebar({ drawerId }: SidebarProps) {
- // const [activeId, setActiveId] = useState<string>('home');
-  const expanded = true;
+  const expanded = true; 
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await api.post('/auth/logout'); 
+      console.log('Sessão encerrada no backend com sucesso!');
+      
+      localStorage.removeItem('token');
+
+      navigate('/login');
+      
+    } catch (error) {
+
+      console.error('Erro ao comunicar logout ao backend:', error);
+      
+      alert('Não foi possível encerrar a sessão corretamente. Tente novamente.');
+    }
+  };
 
   return (
     <aside className="drawer-side z-50">
@@ -24,6 +43,7 @@ export function Sidebar({ drawerId }: SidebarProps) {
         }`}
       >
         <SidebarBrand expanded={expanded} />
+        
         <ul className="menu w-full grow pt-4 gap-2">
           {NAV_ITEMS.map(item => (
             <SidebarItem
@@ -35,6 +55,16 @@ export function Sidebar({ drawerId }: SidebarProps) {
             />
           ))}
         </ul>
+
+        <div className="w-full p-4 border-t border-base-200 mt-auto">
+          <button 
+            onClick={handleLogout}
+            className="btn btn-ghost w-full flex items-center justify-start gap-3 text-error hover:bg-error/10 hover:text-error transition-colors"
+          >
+            <SignOut size={24} weight="bold" />
+            {expanded && <span>Sair</span>}
+          </button>
+        </div>
       </div>
     </aside>
   );
