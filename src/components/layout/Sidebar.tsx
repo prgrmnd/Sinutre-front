@@ -1,8 +1,8 @@
 import { NAV_ITEMS } from '@/constants/navigation';
 import { SidebarBrand } from './SidebarBrand';
 import { SidebarItem } from './SidebarItem';
-// 1. Importamos o ícone de Sair do Phosphor Icons
 import { SignOut } from '@phosphor-icons/react';
+import { api } from '@/lib/api';
 
 interface SidebarProps {
   drawerId: string;
@@ -11,8 +11,17 @@ interface SidebarProps {
 export function Sidebar({ drawerId }: SidebarProps) {
   const expanded = true;
 
-  const handleLogout = () => {
-    console.log('Botão de logout clicado!');
+  const handleLogout = async () => {
+    try {
+
+      await api.post('/auth/logout');      
+
+      console.log('Sessão encerrada no backend com sucesso!');
+    
+    } catch (error) {
+      console.error('Erro ao comunicar logout ao backend:', error);
+
+    }
   };
 
   return (
