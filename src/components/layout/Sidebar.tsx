@@ -17,13 +17,16 @@ export function Sidebar({ drawerId }: SidebarProps) {
     try {
       await api.post('/auth/logout'); 
       console.log('Sessão encerrada no backend com sucesso!');
-    } catch (error) {
-      console.error('Erro ao comunicar logout ao backend:', error);
-    } finally {
       
       localStorage.removeItem('token');
-      
+
       navigate('/login');
+      
+    } catch (error) {
+
+      console.error('Erro ao comunicar logout ao backend:', error);
+      
+      alert('Não foi possível encerrar a sessão corretamente. Tente novamente.');
     }
   };
 
