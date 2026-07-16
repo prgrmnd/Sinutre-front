@@ -1,7 +1,8 @@
+import { useNavigate } from 'react-router-dom';
+import { SignOut } from '@phosphor-icons/react';
 import { NAV_ITEMS } from '@/constants/navigation';
 import { SidebarBrand } from './SidebarBrand';
 import { SidebarItem } from './SidebarItem';
-import { SignOut } from '@phosphor-icons/react';
 import { api } from '@/lib/api';
 
 interface SidebarProps {
@@ -9,18 +10,20 @@ interface SidebarProps {
 }
 
 export function Sidebar({ drawerId }: SidebarProps) {
-  const expanded = true;
+  const expanded = true; 
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
-
-      await api.post('/auth/logout');      
-
+      await api.post('/auth/logout'); 
       console.log('Sessão encerrada no backend com sucesso!');
-    
     } catch (error) {
       console.error('Erro ao comunicar logout ao backend:', error);
-
+    } finally {
+      
+      localStorage.removeItem('token');
+      
+      navigate('/login');
     }
   };
 
@@ -59,7 +62,6 @@ export function Sidebar({ drawerId }: SidebarProps) {
             {expanded && <span>Sair</span>}
           </button>
         </div>
-
       </div>
     </aside>
   );
