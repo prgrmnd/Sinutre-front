@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Plus, Trash } from '@phosphor-icons/react';
+import { Plus, Trash, PencilSimple } from '@phosphor-icons/react';
 import { SimpleHeader } from '@/components/layout/SimpleHeader';
 import { AddFoodModal } from '@/components/modal/AddFoodModal';
 import { getFoods } from '@/services/foodService';
@@ -31,12 +31,34 @@ export function DietFoodPage() {
 
     try {
       await api.delete(`/foods/${id}`);
-      
       setFoods((prevFoods) => prevFoods.filter((food) => food.id !== id));
-      
     } catch (error) {
       console.error('Erro ao excluir alimento:', error);
       alert('Não foi possível excluir o alimento. Tente novamente.');
+    }
+  }
+
+  async function handleEditFood(food: Food) {
+
+    const newName = window.prompt(`Digite o novo nome para "${food.name}":`, food.name);
+    
+    if (!newName || newName === food.name) return;
+
+    try {
+      const updatedData = {
+        ...food,
+        name: newName
+      };
+
+      await api.put(`/foods/${food.id}`, updatedData);
+      
+      setFoods((prevFoods) => 
+        prevFoods.map((f) => (f.id === food.id ? updatedData : f))
+      );
+      
+    } catch (error) {
+      console.error('Erro ao atualizar alimento:', error);
+      alert('Não foi possível atualizar o alimento. Tente novamente.');
     }
   }
 
@@ -63,28 +85,35 @@ export function DietFoodPage() {
                     {food.name}
                   </h2>
                   
-                  <button
-                    onClick={() => handleDeleteFood(food.id)}
-                    className="btn btn-ghost btn-circle btn-sm text-error hover:bg-error/10"
-                    title="Excluir alimento"
-                  >
-                    <Trash size={20} weight="bold" />
-                  </button>
+                  <div className="flex flex-col gap-2 ml-4">
+                    <button
+                      onClick={() => handleEditFood(food)}
+                      className="btn btn-ghost btn-circle btn-sm text-info hover:bg-info/10"
+                      title="Editar alimento"
+                    >
+                      <PencilSimple size={20} weight="bold" />
+                    </button>
+
+                    <button
+                      onClick={() => handleDeleteFood(food.id)}
+                      className="btn btn-ghost btn-circle btn-sm text-error hover:bg-error/10"
+                      title="Excluir alimento"
+                    >
+                      <Trash size={20} weight="bold" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
                   <span>
                     🔥 {food.caloriesPer100g} kcal
                   </span>
-
                   <span>
                     🍞 {food.carbsPer100g} g
                   </span>
-
                   <span>
                     🍗 {food.proteinPer100g} g
                   </span>
-
                   <span>
                     🥑 {food.fatPer100g} g
                   </span>
