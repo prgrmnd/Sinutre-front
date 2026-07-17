@@ -10,35 +10,25 @@ import { AddMealModal } from '@/components/modal/AddMealModal';
 import { useAuth } from '@/context/AuthContext';
 import { Meal } from '@/types/mealSummary';
 import { api } from '@/lib/api';
-
-import {
-  //MACRO_SUMMARY,
-  //MEALS_SUMMARY,
-  // RECENT_MEALS,
-  // SAMPLE_MEAL_ITEMS,
-} from '@/data/mockData';
 import { useMealModal } from '@/hooks/useMealModal';
 
 interface DashboardPageProps {
   drawerId: string;
 }
 
-//const MODAL_MACROS = {
-//  carbs: 0,
-//  proteins: 0,
-//  fats: 0,
-//  calories: 0,
-//};
-
 export function DashboardPage({ drawerId }: DashboardPageProps) {
   const { user } = useAuth();
-  if (!user){
-    return <></>
+  
+  if (!user) {
+    return <></>;
   }
+  
   const modal = useMealModal();
 
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  const [caloricGoal, setCaloricGoal] = useState<number>(2000);
 
   async function loadMeals() {
     try {
@@ -49,8 +39,21 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
     }
   }
 
+  async function loadUserConfig() {
+    try {
+      const response = await api.get('/auth/me'); 
+      
+      if (response.data?.targetCalories) {
+        setCaloricGoal(response.data.targetCalories);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar dados do usuário:', error);
+    }
+  }
+
   useEffect(() => {
     loadMeals();
+    loadUserConfig();
   }, []);
 
   const mealsSummary = useMemo(() => {
@@ -107,12 +110,11 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
         proteins: 0,
         fats: 0,
         calories: 0,
-
-        caloriesGoal: 1000,
+        // Injeta a meta calórica no resumo
+        caloriesGoal: caloricGoal, 
       },
     );
-  }, [meals]);
-
+  }, [meals, caloricGoal]); 
 
   if (loading) {
     return (
