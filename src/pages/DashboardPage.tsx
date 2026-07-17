@@ -11,6 +11,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Meal } from '@/types/mealSummary';
 import { api } from '@/lib/api';
 import { useMealModal } from '@/hooks/useMealModal';
+import { WarningCircle } from '@phosphor-icons/react';
 
 interface DashboardPageProps {
   drawerId: string;
@@ -18,17 +19,18 @@ interface DashboardPageProps {
 
 export function DashboardPage({ drawerId }: DashboardPageProps) {
   const { user } = useAuth();
-  
+
   if (!user) {
     return <></>;
   }
-  
+
   const modal = useMealModal();
 
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
-  
   const [caloricGoal, setCaloricGoal] = useState<number>(2000);
+
+  const [goalExceeded, setGoalExceeded] = useState<boolean>(false);
 
   async function loadMeals() {
     try {
@@ -41,8 +43,7 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
 
   async function loadUserConfig() {
     try {
-      const response = await api.get('/auth/me'); 
-      
+      const response = await api.get('/auth/me');
       if (response.data?.targetCalories) {
         setCaloricGoal(response.data.targetCalories);
       }
@@ -51,19 +52,31 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
     }
   }
 
+  async function checkGoalStatus() {
+    try {
+      const response = await api.get('/meals/goal-status');
+      setGoalExceeded(response.data.exceeded);
+    } catch (error) {
+      console.error('Erro ao verificar status da meta:', error);
+    }
+  }
+
   useEffect(() => {
     loadMeals();
     loadUserConfig();
+    checkGoalStatus();
   }, []);
+
+  async function handleMealCreated() {
+    await loadMeals();
+    await checkGoalStatus();
+  }
 
   const mealsSummary = useMemo(() => {
     const today = new Date();
-
     const total = meals.length;
-
     const todayCount = meals.filter((meal) => {
       const date = new Date(meal.eatTime);
-
       return (
         date.getDate() === today.getDate() &&
         date.getMonth() === today.getMonth() &&
@@ -73,18 +86,13 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
 
     const monthCount = meals.filter((meal) => {
       const date = new Date(meal.eatTime);
-
       return (
         date.getMonth() === today.getMonth() &&
         date.getFullYear() === today.getFullYear()
       );
     }).length;
 
-    return {
-      total,
-      thisMonth: monthCount,
-      today: todayCount,
-    };
+    return { total, thisMonth: monthCount, today: todayCount };
   }, [meals]);
 
   const macroSummary = useMemo(() => {
@@ -102,19 +110,11 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
         acc.proteins += meal.totals.proteins;
         acc.fats += meal.totals.fats;
         acc.calories += meal.totals.calories;
-
         return acc;
       },
-      {
-        carbs: 0,
-        proteins: 0,
-        fats: 0,
-        calories: 0,
-        // Injeta a meta calórica no resumo
-        caloriesGoal: caloricGoal, 
-      },
+      { carbs: 0, proteins: 0, fats: 0, calories: 0, caloriesGoal: caloricGoal },
     );
-  }, [meals, caloricGoal]); 
+  }, [meals, caloricGoal]);
 
   if (loading) {
     return (
@@ -132,6 +132,17 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
           userName={user.name}
           avatarUrl={user.avatarUrl}
         />
+
+        {/* 5. Renderização Condicional do Alerta Visual */}
+        {goalExceeded && (
+          <div role="alert" className="alert alert-error shadow-sm flex items-center gap-3">
+            <WarningCircle size={24} weight="fill" />
+            <div>
+              <h3 className="font-bold">Atenção!</h3>
+              <div className="text-sm">Você ultrapassou sua meta calórica diária.</div>
+            </div>
+          </div>
+        )}
 
         <MacroStatsBar summary={macroSummary} />
 
@@ -151,7 +162,7 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
         typeMeal={modal.selectedCategory}
         onClose={modal.close}
         onSave={modal.close}
-        onMealCreated={loadMeals}
+        onMealCreated={handleMealCreated}
       />
     </>
   );
