@@ -48,51 +48,51 @@ export function DietFoodPage() {
   }
 
   return (
-    <div className="w-full max-w-[1200px] mx-auto">
+    <div className="w-full max-w-[1200px] mx-auto pb-24">
       <SimpleHeader
         title="Dieta"
         subtitle="Gerencie seus alimentos"
       />
 
       {loading ? (
-        <p>Carregando...</p>
+        <p className="mt-6">Carregando...</p>
       ) : (
-        <div className="grid gap-4 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
           {foods.map((food) => (
             <div
               key={food.id}
-              className="card bg-base-100 shadow-sm"
+              className="card card-compact bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition-all"
             >
               <div className="card-body">
-                <div className="flex justify-between items-start mb-2">
-                  <h2 className="card-title m-0">
+                <div className="flex justify-between items-start mb-1">
+                  <h2 className="card-title text-base m-0 line-clamp-1" title={food.name}>
                     {food.name}
                   </h2>
                   
-                  <div className="flex flex-col gap-2 ml-4">
+                  <div className="flex gap-1 ml-2 shrink-0">
                     <button
                       onClick={() => openUpdateModal(food)}
-                      className="btn btn-ghost btn-circle btn-sm text-info hover:bg-info/10"
+                      className="btn btn-ghost btn-xs text-info hover:bg-info/10 px-2"
                       title="Atualizar alimento"
                     >
-                      <PencilSimple size={20} weight="bold" />
+                      <PencilSimple size={16} weight="bold" />
                     </button>
 
                     <button
                       onClick={() => handleDeleteFood(food.id)}
-                      className="btn btn-ghost btn-circle btn-sm text-error hover:bg-error/10"
+                      className="btn btn-ghost btn-xs text-error hover:bg-error/10 px-2"
                       title="Excluir alimento"
                     >
-                      <Trash size={20} weight="bold" />
+                      <Trash size={16} weight="bold" />
                     </button>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-                  <span>🔥 {food.caloriesPer100g} kcal</span>
-                  <span>🍞 {food.carbsPer100g} g</span>
-                  <span>🍗 {food.proteinPer100g} g</span>
-                  <span>🥑 {food.fatPer100g} g</span>
+                <div className="grid grid-cols-2 gap-2 text-xs mt-2 bg-base-200/40 p-2 rounded-lg">
+                  <span className="font-semibold text-primary">🔥 {food.caloriesPer100g} kcal</span>
+                  <span>🍞 {food.carbsPer100g}g</span>
+                  <span>🍗 {food.proteinPer100g}g</span>
+                  <span>🥑 {food.fatPer100g}g</span>
                 </div>
               </div>
             </div>
