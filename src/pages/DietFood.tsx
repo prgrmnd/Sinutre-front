@@ -88,11 +88,37 @@ export function DietFoodPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 text-xs mt-2 bg-base-200/40 p-2 rounded-lg">
-                  <span className="font-semibold text-primary">🔥 {food.caloriesPer100g} kcal</span>
-                  <span>🍞 {food.carbsPer100g}g</span>
-                  <span>🍗 {food.proteinPer100g}g</span>
-                  <span>🥑 {food.fatPer100g}g</span>
+                {/* Área de métricas com rótulos explicativos */}
+                <div className="grid grid-cols-2 gap-y-3 gap-x-2 mt-3 bg-base-200/40 p-3 rounded-lg">
+                  
+                  <div className="flex flex-col">
+                    <span className="text-[10px] uppercase font-bold text-base-content/50 tracking-wider">Calorias</span>
+                    <span className="font-semibold text-primary text-xs mt-0.5">
+                      🔥 {food.caloriesPer100g} kcal
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col">
+                    <span className="text-[10px] uppercase font-bold text-base-content/50 tracking-wider">Carboidratos</span>
+                    <span className="text-xs mt-0.5 text-base-content/80">
+                      🍞 {food.carbsPer100g}g
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col">
+                    <span className="text-[10px] uppercase font-bold text-base-content/50 tracking-wider">Proteínas</span>
+                    <span className="text-xs mt-0.5 text-base-content/80">
+                      🍗 {food.proteinPer100g}g
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col">
+                    <span className="text-[10px] uppercase font-bold text-base-content/50 tracking-wider">Gorduras</span>
+                    <span className="text-xs mt-0.5 text-base-content/80">
+                      🥑 {food.fatPer100g}g
+                    </span>
+                  </div>
+
                 </div>
               </div>
             </div>
