@@ -10,6 +10,7 @@ import { DashboardPage } from '@/pages/DashboardPage';
 import { ProtectedRoute } from './ProtectRoute';
 import { DietFoodPage } from '@/pages/DietFood';
 import { SettingsPage } from '@/pages/SettingsPage';
+import { MetricsPage } from '@/pages/MetricsPage';
 
 export function Router() {
   return (
@@ -31,12 +32,12 @@ export function Router() {
           <Route
             path="/foods"
             element={<DietFoodPage />}
-        
+
           />
 
         </Route>
 
-       
+
 
         <Route
           element={
@@ -66,6 +67,20 @@ export function Router() {
             element={<SettingsPage />}
           />
         </Route>
+
+        <Route
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route
+            path="/metrics"
+            element={<MetricsPage />}
+          />
+        </Route>
+
 
       </Routes>
     </BrowserRouter>
