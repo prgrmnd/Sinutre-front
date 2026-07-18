@@ -14,7 +14,9 @@ export function UpdateFoodModal({ modalId, food, onUpdated }: UpdateFoodModalPro
   const [carbs, setCarbs] = useState<number | ''>('');
   const [protein, setProtein] = useState<number | ''>('');
   const [fat, setFat] = useState<number | ''>('');
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (food) {
@@ -23,16 +25,35 @@ export function UpdateFoodModal({ modalId, food, onUpdated }: UpdateFoodModalPro
       setCarbs(food.carbsPer100g);
       setProtein(food.proteinPer100g);
       setFat(food.fatPer100g);
+      setErrorMessage(null); 
     }
   }, [food]);
 
   function closeModal() {
+    setErrorMessage(null); 
     (document.getElementById(modalId) as HTMLDialogElement)?.close();
   }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    setErrorMessage(null); 
+
     if (!food) return;
+
+    if (!name.trim()) {
+      setErrorMessage('O nome do alimento não pode estar vazio.');
+      return;
+    }
+
+    if (calories === '' || carbs === '' || protein === '' || fat === '') {
+      setErrorMessage('Preencha todos os valores nutricionais.');
+      return;
+    }
+
+    if (Number(calories) < 0 || Number(carbs) < 0 || Number(protein) < 0 || Number(fat) < 0) {
+      setErrorMessage('Os valores nutricionais não podem ser negativos.');
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -46,9 +67,13 @@ export function UpdateFoodModal({ modalId, food, onUpdated }: UpdateFoodModalPro
       
       onUpdated();
       closeModal();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao atualizar alimento:', error);
-      alert('Não foi possível atualizar o alimento.');
+      if (error.response?.data?.error) {
+        setErrorMessage(error.response.data.error);
+      } else {
+        setErrorMessage('Ocorreu um erro inesperado ao salvar o alimento. Tente novamente.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -58,11 +83,18 @@ export function UpdateFoodModal({ modalId, food, onUpdated }: UpdateFoodModalPro
     <dialog id={modalId} className="modal">
       <div className="modal-box">
         <form method="dialog">
-          <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+          <button onClick={closeModal} type="button" className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
         </form>
         
         <h3 className="font-bold text-lg mb-4">Atualizar Alimento</h3>
         
+        {errorMessage && (
+          <div role="alert" className="alert alert-error mb-4 py-2 rounded-lg text-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span>{errorMessage}</span>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="form-control">
             <label className="label"><span className="label-text">Nome</span></label>
@@ -133,7 +165,7 @@ export function UpdateFoodModal({ modalId, food, onUpdated }: UpdateFoodModalPro
       </div>
       
       <form method="dialog" className="modal-backdrop">
-        <button>fechar</button>
+        <button onClick={closeModal} type="button">fechar</button>
       </form>
     </dialog>
   );
