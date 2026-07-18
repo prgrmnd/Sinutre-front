@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { SimpleHeader } from '@/components/layout/SimpleHeader';
-import { Calculator, Fire } from '@phosphor-icons/react'; // Ícones para IMC e Calorias
+import { Calculator, Fire } from '@phosphor-icons/react';
+import { api } from '@/lib/api';
 
 export function MetricsPage() {
   const [loading, setLoading] = useState(true);
@@ -8,13 +9,20 @@ export function MetricsPage() {
   const [averageCalories, setAverageCalories] = useState<number | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setImcData({ value: 23.5, classification: 'Peso Normal' });
-      setAverageCalories(2150);
-      setLoading(false);
-    }, 1500);
+    async function loadMetrics() {
+      try {
+        const response = await api.get('/metrics');
+        
+        setImcData(response.data.imc);
+        setAverageCalories(response.data.averageCalories);
+      } catch (error) {
+        console.error('Erro ao carregar as métricas:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
 
-    return () => clearTimeout(timer);
+    loadMetrics();
   }, []);
 
   return (
@@ -40,13 +48,17 @@ export function MetricsPage() {
                 <div className="skeleton h-10 w-24"></div>
                 <div className="skeleton h-4 w-32 mt-2"></div>
               </div>
-            ) : (
+            ) : imcData ? (
               <div>
-                <span className="text-4xl font-bold">{imcData?.value}</span>
+                <span className="text-4xl font-bold">{imcData.value}</span>
                 <p className="text-base-content/70 mt-2">
-                  Classificação: <strong className="text-base-content">{imcData?.classification}</strong>
+                  Classificação: <strong className="text-base-content">{imcData.classification}</strong>
                 </p>
               </div>
+            ) : (
+              <p className="text-sm text-base-content/70">
+                Dados insuficientes. Preencha seu peso e altura nas configurações.
+              </p>
             )}
           </div>
         </div>
@@ -67,10 +79,10 @@ export function MetricsPage() {
               </div>
             ) : (
               <div>
-                <span className="text-4xl font-bold">{averageCalories}</span>
+                <span className="text-4xl font-bold">{averageCalories || 0}</span>
                 <span className="text-lg text-base-content/60 ml-1">kcal/dia</span>
                 <p className="text-base-content/70 mt-2">
-                  Baseado no seu consumo recente.
+                  Baseado no seu consumo dos últimos 7 dias.
                 </p>
               </div>
             )}
