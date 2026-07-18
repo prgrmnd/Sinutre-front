@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { createFood } from '@/services/foodService';
 
 interface AddFoodModalProps {
@@ -6,10 +6,7 @@ interface AddFoodModalProps {
   onCreated: () => Promise<void> | void;
 }
 
-export function AddFoodModal({
-  modalId,
-  onCreated,
-}: AddFoodModalProps) {
+export function AddFoodModal({ modalId, onCreated }: AddFoodModalProps) {
   const [name, setName] = useState('');
   const [caloriesPer100g, setCaloriesPer100g] = useState('');
   const [carbsPer100g, setCarbsPer100g] = useState('');
@@ -17,14 +14,18 @@ export function AddFoodModal({
   const [fatPer100g, setFatPer100g] = useState('');
   const [loading, setLoading] = useState(false);
   
-  // 1. Estado para controlar a mensagem de erro
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  async function handleSave() {
+  function closeModal() {
+    setErrorMessage(null);
+    (document.getElementById(modalId) as HTMLDialogElement)?.close();
+  }
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
     try {
       setErrorMessage(null);
 
-      // 2. Validações do Front-end
       if (!name.trim()) {
         setErrorMessage('O nome do alimento não pode estar vazio.');
         return;
@@ -50,7 +51,6 @@ export function AddFoodModal({
         fatPer100g: Number(fatPer100g),
       });
 
-      // Limpa tudo após o sucesso
       setName('');
       setCaloriesPer100g('');
       setCarbsPer100g('');
@@ -59,16 +59,10 @@ export function AddFoodModal({
       setErrorMessage(null);
 
       await onCreated();
-
-      (
-        document.getElementById(
-          modalId,
-        ) as HTMLDialogElement
-      )?.close();
+      closeModal();
     } catch (error: any) {
-      // 3. Captura o erro da API (se houver)
       console.error(error);
-      if (error.response && error.response.data && error.response.data.error) {
+      if (error.response?.data?.error) {
         setErrorMessage(error.response.data.error);
       } else {
         setErrorMessage('Ocorreu um erro inesperado ao salvar. Tente novamente.');
@@ -78,21 +72,17 @@ export function AddFoodModal({
     }
   }
 
-  // Função para limpar erros se o usuário fechar o modal
-  function handleCancel() {
-    setErrorMessage(null);
-  }
-
   return (
     <dialog id={modalId} className="modal">
       <div className="modal-box">
-        <h3 className="font-bold text-lg">
-          Novo alimento
-        </h3>
+        <form method="dialog">
+          <button onClick={closeModal} type="button" className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+        </form>
 
-        {/* 4. Banner visual de erro - Aparece apenas se houver erro */}
+        <h3 className="font-bold text-lg mb-4">Novo Alimento</h3>
+
         {errorMessage && (
-          <div role="alert" className="alert alert-error mt-4 py-2 rounded-lg text-sm flex gap-2">
+          <div role="alert" className="alert alert-error mb-4 py-2 rounded-lg text-sm">
             <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -100,73 +90,82 @@ export function AddFoodModal({
           </div>
         )}
 
-        <div className="space-y-3 mt-4">
-          <input
-            className="input input-bordered w-full"
-            placeholder="Nome"
-            value={name}
-            onChange={(e) =>
-              setName(e.target.value)
-            }
-          />
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          
+          <div className="form-control">
+            <label className="label"><span className="label-text">Nome</span></label>
+            <input
+              type="text"
+              required
+              className="input input-bordered w-full"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
 
-          <input
-            type="number"
-            className="input input-bordered w-full"
-            placeholder="Calorias por 100g"
-            value={caloriesPer100g}
-            onChange={(e) =>
-              setCaloriesPer100g(e.target.value)
-            }
-          />
-
-          <input
-            type="number"
-            className="input input-bordered w-full"
-            placeholder="Carboidratos por 100g"
-            value={carbsPer100g}
-            onChange={(e) =>
-              setCarbsPer100g(e.target.value)
-            }
-          />
-
-          <input
-            type="number"
-            className="input input-bordered w-full"
-            placeholder="Proteínas por 100g"
-            value={proteinPer100g}
-            onChange={(e) =>
-              setProteinPer100g(e.target.value)
-            }
-          />
-
-          <input
-            type="number"
-            className="input input-bordered w-full"
-            placeholder="Gorduras por 100g"
-            value={fatPer100g}
-            onChange={(e) =>
-              setFatPer100g(e.target.value)
-            }
-          />
-        </div>
-
-        <div className="modal-action">
-          <form method="dialog">
-            <button className="btn" onClick={handleCancel}>
-              Cancelar
-            </button>
-          </form>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="form-control">
+              <label className="label"><span className="label-text">Calorias (kcal)</span></label>
+              <input
+                type="number"
+                step="0.01"
+                required
+                className="input input-bordered w-full"
+                value={caloriesPer100g}
+                onChange={(e) => setCaloriesPer100g(e.target.value)}
+              />
+            </div>
+            
+            <div className="form-control">
+              <label className="label"><span className="label-text">Carboidratos (g)</span></label>
+              <input
+                type="number"
+                step="0.01"
+                required
+                className="input input-bordered w-full"
+                value={carbsPer100g}
+                onChange={(e) => setCarbsPer100g(e.target.value)}
+              />
+            </div>
+            
+            <div className="form-control">
+              <label className="label"><span className="label-text">Proteínas (g)</span></label>
+              <input
+                type="number"
+                step="0.01"
+                required
+                className="input input-bordered w-full"
+                value={proteinPer100g}
+                onChange={(e) => setProteinPer100g(e.target.value)}
+              />
+            </div>
+            
+            <div className="form-control">
+              <label className="label"><span className="label-text">Gorduras (g)</span></label>
+              <input
+                type="number"
+                step="0.01"
+                required
+                className="input input-bordered w-full"
+                value={fatPer100g}
+                onChange={(e) => setFatPer100g(e.target.value)}
+              />
+            </div>
+          </div>
 
           <button
-            className="btn btn-primary"
+            type="submit"
+            className="btn btn-primary mt-2"
             disabled={loading}
-            onClick={handleSave}
           >
-            {loading ? 'Salvando...' : 'Salvar'}
+            {loading ? 'Salvando...' : 'Salvar Alimento'}
           </button>
-        </div>
+        </form>
       </div>
+
+      <form method="dialog" className="modal-backdrop">
+        <button onClick={closeModal} type="button">fechar</button>
+      </form>
     </dialog>
   );
 }
