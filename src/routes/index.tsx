@@ -1,8 +1,4 @@
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-} from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import { AppLayout } from '@/layouts/AppLayout';
 import { LoginPage } from '@/pages/LoginPage';
@@ -16,11 +12,7 @@ export function Router() {
   return (
     <BrowserRouter>
       <Routes>
-
-        <Route
-          path="/login"
-          element={<LoginPage />}
-        />
+        <Route path="/login" element={<LoginPage />} />
 
         <Route
           element={
@@ -29,59 +21,12 @@ export function Router() {
             </ProtectedRoute>
           }
         >
-          <Route
-            path="/foods"
-            element={<DietFoodPage />}
-
-          />
-
+          <Route path="/" element={<DashboardPage drawerId="main-drawer" />} />
+          <Route path="/foods" element={<DietFoodPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/metrics" element={<MetricsPage />} />
         </Route>
-
-
-
-        <Route
-          element={
-            <ProtectedRoute>
-              <AppLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route
-            path="/"
-            element={
-              <DashboardPage drawerId="main-drawer" />
-            }
-          />
-
-        </Route>
-
-        <Route
-          element={
-            <ProtectedRoute>
-              <AppLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route
-            path="/settings"
-            element={<SettingsPage />}
-          />
-        </Route>
-
-        <Route
-          element={
-            <ProtectedRoute>
-              <AppLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route
-            path="/metrics"
-            element={<MetricsPage />}
-          />
-        </Route>
-
-
+        
       </Routes>
     </BrowserRouter>
   );
