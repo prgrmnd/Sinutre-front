@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Plus, Trash, PencilSimple } from '@phosphor-icons/react';
-import { SimpleHeader } from '@/components/layout/SimpleHeader';
+// 1. Adicionamos os novos ícones na importação
+import { Plus, Trash, PencilSimple, Fire, Lightning, Barbell, Drop } from '@phosphor-icons/react';import { SimpleHeader } from '@/components/layout/SimpleHeader';
 import { AddFoodModal } from '@/components/modal/AddFoodModal';
 import { UpdateFoodModal } from '@/components/modal/UpdateFoodModal'; 
 import { getFoods } from '@/services/foodService';
@@ -88,34 +88,34 @@ export function DietFoodPage() {
                   </div>
                 </div>
 
-                {/* Área de métricas com rótulos explicativos */}
+                {/* 2. Área de métricas com os novos ícones */}
                 <div className="grid grid-cols-2 gap-y-3 gap-x-2 mt-3 bg-base-200/40 p-3 rounded-lg">
                   
                   <div className="flex flex-col">
                     <span className="text-[10px] uppercase font-bold text-base-content/50 tracking-wider">Calorias</span>
-                    <span className="font-semibold text-primary text-xs mt-0.5">
-                      🔥 {food.caloriesPer100g} kcal
+                    <span className="font-semibold text-primary text-xs mt-0.5 flex items-center gap-1">
+                      <Fire size={14} weight="duotone" /> {food.caloriesPer100g} kcal
                     </span>
                   </div>
 
                   <div className="flex flex-col">
                     <span className="text-[10px] uppercase font-bold text-base-content/50 tracking-wider">Carboidratos</span>
-                    <span className="text-xs mt-0.5 text-base-content/80">
-                      🍞 {food.carbsPer100g}g
+                    <span className="text-xs mt-0.5 text-base-content/80 flex items-center gap-1">
+                      <Lightning size={14} weight="duotone" /> {food.carbsPer100g}g
                     </span>
                   </div>
 
                   <div className="flex flex-col">
                     <span className="text-[10px] uppercase font-bold text-base-content/50 tracking-wider">Proteínas</span>
-                    <span className="text-xs mt-0.5 text-base-content/80">
-                      🍗 {food.proteinPer100g}g
+                    <span className="text-xs mt-0.5 text-base-content/80 flex items-center gap-1">
+                      <Barbell size={14} weight="duotone" /> {food.proteinPer100g}g
                     </span>
                   </div>
 
                   <div className="flex flex-col">
                     <span className="text-[10px] uppercase font-bold text-base-content/50 tracking-wider">Gorduras</span>
-                    <span className="text-xs mt-0.5 text-base-content/80">
-                      🥑 {food.fatPer100g}g
+                    <span className="text-xs mt-0.5 text-base-content/80 flex items-center gap-1">
+                      <Drop size={14} weight="duotone" /> {food.fatPer100g}g
                     </span>
                   </div>
 
