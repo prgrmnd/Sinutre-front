@@ -1,5 +1,6 @@
 import type { Meal } from "@/types/mealSummary";
 import { PencilSimple, ListMagnifyingGlass } from '@phosphor-icons/react';
+import { MEAL_CATEGORIES } from '@/constants/mealCategories';
 
 interface MealsTableRowProps {
   meal: Meal;
@@ -13,32 +14,27 @@ export function MealsTableRow({ meal, onActionClick, onEditMeal }: MealsTableRow
     timeStyle: 'short',
   }).format(new Date(meal.eatTime));
 
+  const categoryLabel = MEAL_CATEGORIES.find(
+    (c) => c.id.toLowerCase() === meal.type.toLowerCase()
+  )?.label || meal.type;
+
   return (
     <tr className="hover">
       <td className="text-center font-medium">{meal.id}</td>
       <td>{meal.name}</td>
       <td>{formattedDate}</td>
-      <td>{meal.type}</td>
+      
+      <td>{categoryLabel}</td>
+      
       <td>{Math.round(meal.totals.calories)} kcal</td>
       <td className="text-center">
         <div className="flex justify-center gap-2">
-          
-          <button
-            onClick={() => onEditMeal(meal)}
-            className="btn btn-ghost btn-xs text-info hover:bg-info/10"
-            title="Editar Refeição"
-          >
+          <button onClick={() => onEditMeal(meal)} className="btn btn-ghost btn-xs text-info hover:bg-info/10">
              <PencilSimple size={16} weight="bold" />
           </button>
-          
-          <button
-            onClick={() => onActionClick && onActionClick(meal)}
-            className="btn btn-ghost btn-xs"
-            title="Detalhes"
-          >
+          <button onClick={() => onActionClick && onActionClick(meal)} className="btn btn-ghost btn-xs">
             <ListMagnifyingGlass size={16} weight="bold" />
           </button>
-          
         </div>
       </td>
     </tr>
