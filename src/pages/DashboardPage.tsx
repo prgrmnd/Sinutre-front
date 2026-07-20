@@ -75,6 +75,21 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
     await checkGoalStatus();
   }
 
+  // NOVA FUNÇÃO: Lida com a exclusão da refeição
+  async function handleDeleteMeal(meal: Meal) {
+    const confirm = window.confirm(`Tem certeza que deseja excluir a refeição "${meal.name}"?`);
+    if (!confirm) return;
+
+    try {
+      await api.delete(`/meals/${meal.id}`);
+      // Recarrega as listas e metas após excluir
+      await handleMealCreated(); 
+    } catch (error) {
+      console.error('Erro ao excluir refeição:', error);
+      alert('Erro ao excluir a refeição. Tente novamente.');
+    }
+  }
+
   const mealsSummary = useMemo(() => {
     const today = new Date();
     const total = meals.length;
@@ -153,9 +168,17 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
           <AddMealCard onSelectCategory={modal.openWith} />
         </div>
 
-        {/* Repassando a função de edição para os componentes filhos */}
-        <MealsTable meals={meals} onEditMeal={setMealToEdit} />
-        <MealsList meals={meals} onEditMeal={setMealToEdit} />
+        {/* Repassando a função de exclusão para os componentes filhos */}
+        <MealsTable 
+          meals={meals} 
+          onEditMeal={setMealToEdit} 
+          onDeleteMeal={handleDeleteMeal} 
+        />
+        <MealsList 
+          meals={meals} 
+          onEditMeal={setMealToEdit} 
+          onDeleteMeal={handleDeleteMeal} 
+        />
       </div>
 
       <MealFab onSelectCategory={modal.openWith} />

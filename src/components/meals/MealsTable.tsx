@@ -4,11 +4,11 @@ import { MealsTableRow } from './MealsTableRow';
 interface MealsTableProps {
   meals: Meal[];
   onActionClick?: (meal: Meal) => void;
-  onEditMeal: (meal: Meal) => void; // <-- 1. Adicionamos a propriedade aqui
+  onEditMeal: (meal: Meal) => void;
+  onDeleteMeal: (meal: Meal) => void; // <-- Propriedade de excluir adicionada
 }
 
-export function MealsTable({ meals, onActionClick, onEditMeal }: MealsTableProps) {
-  
+export function MealsTable({ meals, onActionClick, onEditMeal, onDeleteMeal }: MealsTableProps) {
   return (
     <section className="card bg-base-100 shadow-sm w-full hidden lg:block">
       <div className="overflow-x-auto">
@@ -29,7 +29,8 @@ export function MealsTable({ meals, onActionClick, onEditMeal }: MealsTableProps
                 key={meal.id}
                 meal={meal}
                 onActionClick={onActionClick}
-                onEditMeal={onEditMeal} // <-- 2. Repassamos a função para a linha
+                onEditMeal={onEditMeal}
+                onDeleteMeal={onDeleteMeal} // <-- Repassando para a linha
               />
             ))}
           </tbody>
