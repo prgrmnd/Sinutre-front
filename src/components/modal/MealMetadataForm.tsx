@@ -17,7 +17,7 @@ export function MealMetadataForm( {meal, setMeal} : MealMetadataProp) {
           type="text"
           placeholder="Ex: almoço pós treino"
           className="input input-bordered w-full"
-          value={meal.description || ''} // <-- ADICIONADO O VALUE AQUI
+          value={meal.description || ''}
           onChange={(e) =>
             setMeal({
               ...meal,
@@ -31,7 +31,7 @@ export function MealMetadataForm( {meal, setMeal} : MealMetadataProp) {
         <select
           id="meal-category"
           className="select select-bordered w-full"
-          value={meal.type || ''} // <-- TROCADO DE defaultValue PARA value AQUI
+          value={meal.type || ''} 
           disabled={true}
           onChange={(e) =>
             setMeal({
@@ -56,7 +56,7 @@ export function MealMetadataForm( {meal, setMeal} : MealMetadataProp) {
           id="meal-datetime"
           type="datetime-local"
           className="input input-bordered w-full"
-          value={meal.eatTime || ''} // <-- ADICIONADO O VALUE AQUI
+          value={meal.eatTime || ''}
           onChange={(e) =>
             setMeal({
               ...meal,
