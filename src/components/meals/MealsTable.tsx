@@ -5,7 +5,7 @@ interface MealsTableProps {
   meals: Meal[];
   onActionClick?: (meal: Meal) => void;
   onEditMeal: (meal: Meal) => void;
-  onDeleteMeal: (meal: Meal) => void; // <-- Propriedade de excluir adicionada
+  onDeleteMeal: (meal: Meal) => void;
 }
 
 export function MealsTable({ meals, onActionClick, onEditMeal, onDeleteMeal }: MealsTableProps) {
@@ -30,7 +30,7 @@ export function MealsTable({ meals, onActionClick, onEditMeal, onDeleteMeal }: M
                 meal={meal}
                 onActionClick={onActionClick}
                 onEditMeal={onEditMeal}
-                onDeleteMeal={onDeleteMeal} // <-- Repassando para a linha
+                onDeleteMeal={onDeleteMeal}
               />
             ))}
           </tbody>

@@ -168,7 +168,6 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
           <AddMealCard onSelectCategory={modal.openWith} />
         </div>
 
-        {/* Repassando a função de exclusão para os componentes filhos */}
         <MealsTable 
           meals={meals} 
           onEditMeal={setMealToEdit} 
