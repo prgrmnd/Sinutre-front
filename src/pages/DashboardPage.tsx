@@ -7,6 +7,7 @@ import { MealFab } from '@/components/meals/MealFab';
 import { MealsList } from '@/components/meals/MealsList';
 import { MealsTable } from '@/components/meals/MealsTable';
 import { AddMealModal } from '@/components/modal/AddMealModal';
+import { UpdateMealModal } from '@/components/modal/UpdateMealModal';
 import { useAuth } from '@/context/AuthContext';
 import { Meal } from '@/types/mealSummary';
 import { api } from '@/lib/api';
@@ -29,8 +30,10 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
   const [caloricGoal, setCaloricGoal] = useState<number>(2000);
-
   const [goalExceeded, setGoalExceeded] = useState<boolean>(false);
+
+  // Estado para armazenar qual refeição o usuário deseja editar
+  const [mealToEdit, setMealToEdit] = useState<Meal | null>(null);
 
   async function loadMeals() {
     try {
@@ -70,6 +73,21 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
   async function handleMealCreated() {
     await loadMeals();
     await checkGoalStatus();
+  }
+
+  // NOVA FUNÇÃO: Lida com a exclusão da refeição
+  async function handleDeleteMeal(meal: Meal) {
+    const confirm = window.confirm(`Tem certeza que deseja excluir a refeição "${meal.name}"?`);
+    if (!confirm) return;
+
+    try {
+      await api.delete(`/meals/${meal.id}`);
+      // Recarrega as listas e metas após excluir
+      await handleMealCreated(); 
+    } catch (error) {
+      console.error('Erro ao excluir refeição:', error);
+      alert('Erro ao excluir a refeição. Tente novamente.');
+    }
   }
 
   const mealsSummary = useMemo(() => {
@@ -133,7 +151,6 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
           avatarUrl={user.avatarUrl}
         />
 
-        {/* 5. Renderização Condicional do Alerta Visual */}
         {goalExceeded && (
           <div role="alert" className="alert alert-error shadow-sm flex items-center gap-3">
             <WarningCircle size={24} weight="fill" />
@@ -151,8 +168,17 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
           <AddMealCard onSelectCategory={modal.openWith} />
         </div>
 
-        <MealsTable meals={meals} />
-        <MealsList meals={meals} />
+        {/* Repassando a função de exclusão para os componentes filhos */}
+        <MealsTable 
+          meals={meals} 
+          onEditMeal={setMealToEdit} 
+          onDeleteMeal={handleDeleteMeal} 
+        />
+        <MealsList 
+          meals={meals} 
+          onEditMeal={setMealToEdit} 
+          onDeleteMeal={handleDeleteMeal} 
+        />
       </div>
 
       <MealFab onSelectCategory={modal.openWith} />
@@ -164,6 +190,18 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
         onSave={modal.close}
         onMealCreated={handleMealCreated}
       />
+
+      {mealToEdit && (
+        <UpdateMealModal
+          open={!!mealToEdit}
+          mealToEdit={mealToEdit}
+          onClose={() => setMealToEdit(null)}
+          onMealUpdated={async () => {
+            setMealToEdit(null);
+            await handleMealCreated();
+          }}
+        />
+      )}
     </>
   );
 }

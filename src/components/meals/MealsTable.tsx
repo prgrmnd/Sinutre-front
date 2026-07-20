@@ -4,10 +4,11 @@ import { MealsTableRow } from './MealsTableRow';
 interface MealsTableProps {
   meals: Meal[];
   onActionClick?: (meal: Meal) => void;
+  onEditMeal: (meal: Meal) => void;
+  onDeleteMeal: (meal: Meal) => void; // <-- Propriedade de excluir adicionada
 }
 
-export function MealsTable({ meals, onActionClick }: MealsTableProps) {
-  
+export function MealsTable({ meals, onActionClick, onEditMeal, onDeleteMeal }: MealsTableProps) {
   return (
     <section className="card bg-base-100 shadow-sm w-full hidden lg:block">
       <div className="overflow-x-auto">
@@ -19,7 +20,7 @@ export function MealsTable({ meals, onActionClick }: MealsTableProps) {
               <th>Data</th>
               <th>Categoria</th>
               <th>Total de Calorias</th>
-              <th className="text-center">Ação</th>
+              <th className="text-center">Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -28,6 +29,8 @@ export function MealsTable({ meals, onActionClick }: MealsTableProps) {
                 key={meal.id}
                 meal={meal}
                 onActionClick={onActionClick}
+                onEditMeal={onEditMeal}
+                onDeleteMeal={onDeleteMeal} // <-- Repassando para a linha
               />
             ))}
           </tbody>
