@@ -1,36 +1,45 @@
-import { DotsThree } from '@phosphor-icons/react';
-import { MEAL_CATEGORY_BY_ID } from '@/constants/mealCategories';
-import type { Meal } from '@/types/mealSummary';
-import { formatDate } from '@/utils/date';
+import type { Meal } from "@/types/mealSummary";
+import { PencilSimple, ListMagnifyingGlass } from '@phosphor-icons/react';
 
 interface MealsTableRowProps {
   meal: Meal;
   onActionClick?: (meal: Meal) => void;
+  onEditMeal: (meal: Meal) => void; 
 }
 
-export function MealsTableRow({ meal, onActionClick }: MealsTableRowProps) {
-  const category = MEAL_CATEGORY_BY_ID[meal.type];
+export function MealsTableRow({ meal, onActionClick, onEditMeal }: MealsTableRowProps) {
+  const formattedDate = new Intl.DateTimeFormat('pt-BR', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  }).format(new Date(meal.eatTime));
 
   return (
     <tr className="hover">
-      <td className="text-center font-bold text-base-content/60">{meal.id}</td>
-      <td className="font-medium">{meal.name}</td>
-      <td className="font-medium">{formatDate(meal.eatTime)}</td>
-      <td className="font-semibold">{category.label}</td>
-      <td>
-        <span className="badge badge-primary badge-outline">
-          {meal.totals.calories} kcal
-        </span>
-      </td>
+      <td className="text-center font-medium">{meal.id}</td>
+      <td>{meal.name}</td>
+      <td>{formattedDate}</td>
+      <td>{meal.type}</td>
+      <td>{Math.round(meal.totals.calories)} kcal</td>
       <td className="text-center">
-        <button
-          type="button"
-          onClick={() => onActionClick?.(meal)}
-          className="btn btn-sm btn-ghost btn-square"
-          aria-label="Mais ações"
-        >
-          <DotsThree size={20} />
-        </button>
+        <div className="flex justify-center gap-2">
+          
+          <button
+            onClick={() => onEditMeal(meal)}
+            className="btn btn-ghost btn-xs text-info hover:bg-info/10"
+            title="Editar Refeição"
+          >
+             <PencilSimple size={16} weight="bold" />
+          </button>
+          
+          <button
+            onClick={() => onActionClick && onActionClick(meal)}
+            className="btn btn-ghost btn-xs"
+            title="Detalhes"
+          >
+            <ListMagnifyingGlass size={16} weight="bold" />
+          </button>
+          
+        </div>
       </td>
     </tr>
   );
