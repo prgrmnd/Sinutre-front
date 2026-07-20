@@ -9,7 +9,7 @@ import { MealState } from '@/types/meal';
 
 interface UpdateMealModalProps {
   open: boolean;
-  mealToEdit: any | null; // Refeição selecionada vinda da tabela
+  mealToEdit: any | null;
   onClose: () => void;
   onMealUpdated: () => Promise<void>;
 }
@@ -20,6 +20,7 @@ export function UpdateMealModal({
   onClose,
   onMealUpdated
 }: UpdateMealModalProps) {
+  
   const [meal, setMeal] = useState<MealState>({
     description: '',
     type: 'BREAKFAST', 
@@ -27,30 +28,48 @@ export function UpdateMealModal({
   });
 
   const [items, setItems] = useState<FoodItem[]>([]);
+  const [isDataReady, setIsDataReady] = useState(false);
 
-  // Carrega os dados da refeição no modal assim que ele é aberto
   useEffect(() => {
     if (mealToEdit && open) {
+      // 1. Prepara a data removendo bugs de fuso horário
+      let localTime = '';
+      if (mealToEdit.eatTime) {
+        try {
+          const d = new Date(mealToEdit.eatTime);
+          if (!isNaN(d.getTime())) {
+            const tzOffset = d.getTimezoneOffset() * 60000;
+            localTime = new Date(d.getTime() - tzOffset).toISOString().slice(0, 16);
+          }
+        } catch (error) {
+          console.error("Erro ao converter data", error);
+        }
+      }
+
+      // 2. Preenche os estados
       setMeal({
-        description: mealToEdit.name || '',
-        type: mealToEdit.type || 'BREAKFAST',
-        // Ajusta a data para o formato aceito pelo input datetime-local
-        eatTime: mealToEdit.eatTime ? new Date(mealToEdit.eatTime).toISOString().slice(0, 16) : '',
+        description: mealToEdit.name || mealToEdit.description || '',
+        type: mealToEdit.type || 'BREAKFAST', 
+        eatTime: localTime,
       });
 
       if (mealToEdit.items) {
-        const mappedItems = mealToEdit.items.map((item: any) => ({
+        setItems(mealToEdit.items.map((item: any) => ({
           id: item.id || Math.random().toString(), 
-          foodId: item.foodId,
+          foodId: item.foodId || item.food?.id,
           name: item.food?.name || 'Alimento',
-          grams: item.foodG,
-          calories: item.calories,
-          carbs: item.carbs,
-          protein: item.protein,
-          fat: item.fat,
-        }));
-        setItems(mappedItems);
+          grams: item.foodG || item.grams || 0,
+          calories: item.calories || 0,
+          carbs: item.carbs || 0,
+          protein: item.protein || 0,
+          fat: item.fat || 0,
+        })));
       }
+
+      // 3. Sinaliza que o React já pode desenhar os formulários
+      setIsDataReady(true);
+    } else {
+      setIsDataReady(false);
     }
   }, [mealToEdit, open]);
 
@@ -97,17 +116,20 @@ export function UpdateMealModal({
     [items]
   );
 
-  if (!mealToEdit) return <></>;
+  // Se o modal estiver fechado ou os dados ainda não estiverem prontos, não renderiza o conteúdo para evitar inputs vazios
+  if (!open || !mealToEdit || !isDataReady) return null;
 
   return (
-    <div className={`modal ${open ? 'modal-open' : ''}`} role="dialog">
+    <div className="modal modal-open" role="dialog">
       <div className="modal-box max-w-6xl">
         <h2 className="text-3xl font-semibold mb-6">Editar Refeição</h2>
         
         <MealMacrosSummary macros={macros} />
-        <MealMetadataForm meal={meal} setMeal={setMeal} />
+        
+        {/* A chave (key) obriga os inputs a recarregarem com a descrição e data certas! */}
+        <MealMetadataForm key={`meta-${mealToEdit.id}`} meal={meal} setMeal={setMeal} />
 
-        <div className="mb-4">
+        <div className="mb-4 mt-6">
           <h3 className="text-lg font-semibold mb-4">Itens da Refeição</h3>
           <MealItemForm onAdd={handleAddItem} />
         </div>
