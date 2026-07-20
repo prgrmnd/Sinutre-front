@@ -18,7 +18,6 @@ interface AddMealModalProps {
   onMealCreated: () => Promise<void>;
 }
 
-
 export function AddMealModal({
   open,
   typeMeal,
@@ -40,37 +39,53 @@ export function AddMealModal({
 
   const [items, setItems] = useState<FoodItem[]>([]);
 
-  function handleAddItem(
-    item: FoodItem,
-  ) {
-    setItems((current) => [
-      ...current,
-      item,
-    ]);
+  function handleAddItem(item: FoodItem) {
+    setItems((current) => [...current, item]);
   }
 
-  function handleRemoveItem(
-    item: FoodItem,
-  ) {
-    setItems((current) =>
-      current.filter(
-        (x) => x.id !== item.id,
-      ),
-    );
+  function handleRemoveItem(item: FoodItem) {
+    setItems((current) => current.filter((x) => x.id !== item.id));
   }
 
   async function handleSaveMeal() {
-    await createMeal({
-      ...meal,
-      items: items.map((item) => ({
-        foodId: item.foodId,
-        grams: item.grams,
-      })),
-    });
+    if (!meal.description || meal.description.trim() === '') {
+      alert("Por favor, preencha a descrição da refeição.");
+      return;
+    }
 
-    await onMealCreated();
+    if (!meal.eatTime) {
+      alert("Por favor, informe a data e o horário da refeição.");
+      return;
+    }
 
-    onClose();
+    if (items.length === 0) {
+      alert("Por favor, adicione pelo menos um alimento à refeição antes de salvar.");
+      return;
+    }
+
+    try {
+      await createMeal({
+        ...meal,
+        items: items.map((item) => ({
+          foodId: item.foodId,
+          grams: item.grams,
+        })),
+      });
+
+      await onMealCreated();
+
+      setMeal({
+        description: '',
+        type: category.id,
+        eatTime: '',
+      });
+      setItems([]);
+
+      onClose();
+    } catch (error) {
+      console.error("Erro ao salvar refeição:", error);
+      alert("Ocorreu um erro ao salvar a refeição. Tente novamente.");
+    }
   }
 
   const macros = useMemo(
@@ -94,7 +109,6 @@ export function AddMealModal({
       ),
     [items],
   );
-
 
   return (
     <div className={`modal ${open ? 'modal-open' : ''}`} role="dialog">
