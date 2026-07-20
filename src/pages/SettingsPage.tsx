@@ -90,6 +90,7 @@ export function SettingsPage() {
 
       <UpdateProfileModal 
         isOpen={isModalOpen} 
+        initialData={profile}
         onClose={() => {
           setIsModalOpen(false);
           fetchProfile(); 
@@ -98,3 +99,4 @@ export function SettingsPage() {
     </div>
   );
 }
+
