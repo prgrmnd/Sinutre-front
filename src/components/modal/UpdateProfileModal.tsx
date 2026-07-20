@@ -1,18 +1,38 @@
-import { useState, FormEvent } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import { updateProfile } from '@/services/userService';
+
+interface UserProfile {
+  height?: number | null;
+  weight?: number | null;
+  targetCalories?: number | null;
+}
 
 interface UpdateProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialData?: UserProfile | null; 
 }
 
-export function UpdateProfileModal({ isOpen, onClose }: UpdateProfileModalProps) {
+export function UpdateProfileModal({ isOpen, onClose, initialData }: UpdateProfileModalProps) {
   const [height, setHeight] = useState<string | number>('');
   const [weight, setWeight] = useState<string | number>('');
   const [targetCalories, setTargetCalories] = useState<string | number>('');
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen && initialData) {
+      setHeight(initialData.height || '');
+      setWeight(initialData.weight || '');
+      setTargetCalories(initialData.targetCalories || '');
+    } else if (!isOpen) {
+      setHeight('');
+      setWeight('');
+      setTargetCalories('');
+      setError(null);
+    }
+  }, [isOpen, initialData]);
 
   if (!isOpen) return null;
 
