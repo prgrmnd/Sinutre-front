@@ -32,7 +32,6 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
   const [caloricGoal, setCaloricGoal] = useState<number>(2000);
   const [goalExceeded, setGoalExceeded] = useState<boolean>(false);
 
-  // Estado para armazenar qual refeição o usuário deseja editar
   const [mealToEdit, setMealToEdit] = useState<Meal | null>(null);
 
   async function loadMeals() {
@@ -75,14 +74,12 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
     await checkGoalStatus();
   }
 
-  // NOVA FUNÇÃO: Lida com a exclusão da refeição
   async function handleDeleteMeal(meal: Meal) {
     const confirm = window.confirm(`Tem certeza que deseja excluir a refeição "${meal.name}"?`);
     if (!confirm) return;
 
     try {
       await api.delete(`/meals/${meal.id}`);
-      // Recarrega as listas e metas após excluir
       await handleMealCreated(); 
     } catch (error) {
       console.error('Erro ao excluir refeição:', error);
@@ -115,10 +112,11 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
 
   const macroSummary = useMemo(() => {
     const today = new Date();
-    return meals.filter((meal) => {
+    
+    const rawTotals = meals.filter((meal) => {
       const date = new Date(meal.eatTime);
       return (
-        date.getDay() === today.getDay() &&
+        date.getDate() === today.getDate() &&
         date.getMonth() === today.getMonth() &&
         date.getFullYear() === today.getFullYear()
       );
@@ -130,8 +128,16 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
         acc.calories += meal.totals.calories;
         return acc;
       },
-      { carbs: 0, proteins: 0, fats: 0, calories: 0, caloriesGoal: caloricGoal },
+      { carbs: 0, proteins: 0, fats: 0, calories: 0 },
     );
+
+    return {
+      carbs: Math.round(rawTotals.carbs),
+      proteins: Math.round(rawTotals.proteins),
+      fats: Math.round(rawTotals.fats),
+      calories: Math.round(rawTotals.calories),
+      caloriesGoal: caloricGoal,
+    };
   }, [meals, caloricGoal]);
 
   if (loading) {
