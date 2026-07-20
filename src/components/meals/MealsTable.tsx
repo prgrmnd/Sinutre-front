@@ -4,9 +4,10 @@ import { MealsTableRow } from './MealsTableRow';
 interface MealsTableProps {
   meals: Meal[];
   onActionClick?: (meal: Meal) => void;
+  onEditMeal: (meal: Meal) => void; // <-- 1. Adicionamos a propriedade aqui
 }
 
-export function MealsTable({ meals, onActionClick }: MealsTableProps) {
+export function MealsTable({ meals, onActionClick, onEditMeal }: MealsTableProps) {
   
   return (
     <section className="card bg-base-100 shadow-sm w-full hidden lg:block">
@@ -19,7 +20,7 @@ export function MealsTable({ meals, onActionClick }: MealsTableProps) {
               <th>Data</th>
               <th>Categoria</th>
               <th>Total de Calorias</th>
-              <th className="text-center">Ação</th>
+              <th className="text-center">Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -28,6 +29,7 @@ export function MealsTable({ meals, onActionClick }: MealsTableProps) {
                 key={meal.id}
                 meal={meal}
                 onActionClick={onActionClick}
+                onEditMeal={onEditMeal} // <-- 2. Repassamos a função para a linha
               />
             ))}
           </tbody>
