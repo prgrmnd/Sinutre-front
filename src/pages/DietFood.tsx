@@ -6,6 +6,7 @@ import { UpdateFoodModal } from '@/components/modal/UpdateFoodModal';
 import { getFoods } from '@/services/foodService';
 import type { Food } from '@/types/food';
 import { api } from '@/lib/api';
+import { useToast } from '@/context/ToastContext';
 
 const MODAL_ID = 'create-food-modal';
 const UPDATE_MODAL_ID = 'update-food-modal';
@@ -13,6 +14,7 @@ const UPDATE_MODAL_ID = 'update-food-modal';
 export function DietFoodPage() {
   const [foods, setFoods] = useState<Food[]>([]);
   const [loading, setLoading] = useState(true);
+  const { addToast } = useToast();
   
   const [foodToEdit, setFoodToEdit] = useState<Food | null>(null);
 
@@ -36,9 +38,10 @@ export function DietFoodPage() {
     try {
       await api.delete(`/foods/${id}`);
       setFoods((prevFoods) => prevFoods.filter((food) => food.id !== id));
+      addToast('success', 'Alimento excluído com sucesso!');
     } catch (error) {
       console.error('Erro ao excluir alimento:', error);
-      alert('Não foi possível excluir o alimento. Tente novamente.');
+      addToast('error', 'Não foi possível excluir o alimento. Tente novamente.');
     }
   }
 

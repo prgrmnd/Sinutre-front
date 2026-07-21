@@ -1,5 +1,6 @@
 import { useState, FormEvent } from 'react';
 import { createFood } from '@/services/foodService';
+import { useToast } from '@/context/ToastContext';
 
 interface AddFoodModalProps {
   modalId: string;
@@ -7,37 +8,33 @@ interface AddFoodModalProps {
 }
 
 export function AddFoodModal({ modalId, onCreated }: AddFoodModalProps) {
+  const { addToast } = useToast();
   const [name, setName] = useState('');
   const [caloriesPer100g, setCaloriesPer100g] = useState('');
   const [carbsPer100g, setCarbsPer100g] = useState('');
   const [proteinPer100g, setProteinPer100g] = useState('');
   const [fatPer100g, setFatPer100g] = useState('');
   const [loading, setLoading] = useState(false);
-  
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   function closeModal() {
-    setErrorMessage(null);
     (document.getElementById(modalId) as HTMLDialogElement)?.close();
   }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     try {
-      setErrorMessage(null);
-
       if (!name.trim()) {
-        setErrorMessage('O nome do alimento não pode estar vazio.');
+        addToast('error', 'O nome do alimento não pode estar vazio.');
         return;
       }
 
       if (caloriesPer100g === '' || carbsPer100g === '' || proteinPer100g === '' || fatPer100g === '') {
-        setErrorMessage('Preencha todos os valores nutricionais.');
+        addToast('error', 'Preencha todos os valores nutricionais.');
         return;
       }
 
       if (Number(caloriesPer100g) < 0 || Number(carbsPer100g) < 0 || Number(proteinPer100g) < 0 || Number(fatPer100g) < 0) {
-        setErrorMessage('Os valores nutricionais não podem ser negativos.');
+        addToast('error', 'Os valores nutricionais não podem ser negativos.');
         return;
       }
 
@@ -56,16 +53,16 @@ export function AddFoodModal({ modalId, onCreated }: AddFoodModalProps) {
       setCarbsPer100g('');
       setProteinPer100g('');
       setFatPer100g('');
-      setErrorMessage(null);
 
       await onCreated();
+      addToast('success', 'Alimento cadastrado com sucesso!');
       closeModal();
     } catch (error: any) {
       console.error(error);
       if (error.response?.data?.error) {
-        setErrorMessage(error.response.data.error);
+        addToast('error', error.response.data.error);
       } else {
-        setErrorMessage('Ocorreu um erro inesperado ao salvar. Tente novamente.');
+        addToast('error', 'Ocorreu um erro inesperado ao salvar. Tente novamente.');
       }
     } finally {
       setLoading(false);
@@ -80,15 +77,6 @@ export function AddFoodModal({ modalId, onCreated }: AddFoodModalProps) {
         </form>
 
         <h3 className="font-bold text-lg mb-4">Novo Alimento</h3>
-
-        {errorMessage && (
-          <div role="alert" className="alert alert-error mb-4 py-2 rounded-lg text-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>{errorMessage}</span>
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           

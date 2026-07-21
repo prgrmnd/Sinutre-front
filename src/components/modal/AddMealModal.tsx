@@ -23,12 +23,13 @@ export function AddMealModal({
   onClose,
   onMealCreated
 }: AddMealModalProps) {
+  const { addToast } = useToast();
+
   if (!typeMeal) {
     return <></>;
   }
 
   const category = MEAL_CATEGORY_BY_ID[typeMeal];
-  const { addToast } = useToast();
 
   const [meal, setMeal] = useState<MealState>({
     description: '',

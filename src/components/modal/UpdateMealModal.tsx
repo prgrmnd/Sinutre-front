@@ -5,6 +5,7 @@ import { MealItemsTable } from './MealItemsTable';
 import { MealMacrosSummary } from './MealMacrosSummary';
 import { MealMetadataForm } from './MealMetadataForm';
 import { api } from '@/lib/api';
+import { useToast } from '@/context/ToastContext';
 import { MealState } from '@/types/meal';
 
 interface UpdateMealModalProps {
@@ -20,6 +21,7 @@ export function UpdateMealModal({
   onClose,
   onMealUpdated
 }: UpdateMealModalProps) {
+  const { addToast } = useToast();
   
   const [meal, setMeal] = useState<MealState>({
     description: '',
@@ -94,10 +96,11 @@ export function UpdateMealModal({
       });
 
       await onMealUpdated();
+      addToast('success', 'Refeição atualizada com sucesso!');
       onClose();
     } catch (error) {
       console.error("Erro ao atualizar refeição:", error);
-      alert("Erro ao atualizar a refeição. Verifique os dados.");
+      addToast('error', 'Erro ao atualizar a refeição. Verifique os dados.');
     }
   }
 
