@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import type { FoodItem } from '@/types/meal';
 import { MealItemForm } from './MealItemForm';
 import { MealItemsTable } from './MealItemsTable';
@@ -7,13 +7,12 @@ import { MealMetadataForm } from './MealMetadataForm';
 import { MealCategory } from '@/types/meal';
 import { MEAL_CATEGORY_BY_ID } from '@/constants/mealCategories';
 import { createMeal } from '@/services/mealService';
-
+import { useToast } from '@/context/ToastContext';
 import { MealState } from '@/types/meal';
 
 interface AddMealModalProps {
   open: boolean;
   onClose: () => void;
-  onSave: () => void;
   typeMeal: MealCategory | null;
   onMealCreated: () => Promise<void>;
 }
@@ -24,12 +23,13 @@ export function AddMealModal({
   onClose,
   onMealCreated
 }: AddMealModalProps) {
-  if(!typeMeal){
-    return <></>
+  if (!typeMeal) {
+    return <></>;
   }
 
   const category = MEAL_CATEGORY_BY_ID[typeMeal];
-  
+  const { addToast } = useToast();
+
   const [meal, setMeal] = useState<MealState>({
     description: '',
     type: category.id,
@@ -38,18 +38,9 @@ export function AddMealModal({
 
   const [items, setItems] = useState<FoodItem[]>([]);
   const [isSaving, setIsSaving] = useState(false);
-  
-  const [feedback, setFeedback] = useState<{ type: 'error' | 'success', message: string } | null>(null);
-
-  useEffect(() => {
-    if (!open) {
-      setFeedback(null);
-    }
-  }, [open]);
 
   function handleAddItem(item: FoodItem) {
     setItems((current) => [...current, item]);
-    setFeedback(null);
   }
 
   function handleRemoveItem(item: FoodItem) {
@@ -57,20 +48,18 @@ export function AddMealModal({
   }
 
   async function handleSaveMeal() {
-    setFeedback(null);
-
     if (!meal.description || meal.description.trim() === '') {
-      setFeedback({ type: 'error', message: 'Por favor, preencha a descrição da refeição.' });
+      addToast('error', 'Por favor, preencha a descrição da refeição.');
       return;
     }
 
     if (!meal.eatTime) {
-      setFeedback({ type: 'error', message: 'Por favor, informe a data e o horário da refeição.' });
+      addToast('error', 'Por favor, informe a data e o horário da refeição.');
       return;
     }
 
     if (items.length === 0) {
-      setFeedback({ type: 'error', message: 'Por favor, adicione pelo menos um alimento à refeição.' });
+      addToast('error', 'Por favor, adicione pelo menos um alimento à refeição.');
       return;
     }
 
@@ -86,18 +75,16 @@ export function AddMealModal({
 
       await onMealCreated();
 
-      setFeedback({ type: 'success', message: 'Refeição cadastrada com sucesso!' });
+      addToast('success', 'Refeição cadastrada com sucesso!');
       
-      setTimeout(() => {
-        setMeal({ description: '', type: category.id, eatTime: '' });
-        setItems([]);
-        setIsSaving(false);
-        onClose();
-      }, 1500);
+      setMeal({ description: '', type: category.id, eatTime: '' });
+      setItems([]);
+      onClose();
 
     } catch (error) {
       console.error("Erro ao salvar refeição:", error);
-      setFeedback({ type: 'error', message: 'Ocorreu um erro no servidor ao salvar a refeição. Tente novamente.' });
+      addToast('error', 'Ocorreu um erro no servidor ao salvar a refeição. Tente novamente.');
+    } finally {
       setIsSaving(false);
     }
   }
@@ -128,12 +115,6 @@ export function AddMealModal({
     <div className={`modal ${open ? 'modal-open' : ''}`} role="dialog">
       <div className="modal-box max-w-6xl">
         <h2 className="text-3xl font-semibold mb-6">Adicionar Refeição</h2>
-        
-        {feedback && (
-          <div className={`alert ${feedback.type === 'error' ? 'alert-error' : 'alert-success'} shadow-sm mb-6 rounded-lg`}>
-            <span>{feedback.message}</span>
-          </div>
-        )}
 
         <MealMacrosSummary macros={macros} />
         <MealMetadataForm meal={meal} setMeal={setMeal} />
@@ -150,7 +131,7 @@ export function AddMealModal({
             type="button" 
             className="btn btn-ghost" 
             onClick={onClose}
-            disabled={isSaving || feedback?.type === 'success'}
+            disabled={isSaving}
           >
             Cancelar
           </button>
@@ -159,7 +140,7 @@ export function AddMealModal({
             type="button" 
             className="btn btn-primary" 
             onClick={handleSaveMeal}
-            disabled={isSaving || feedback?.type === 'success'}
+            disabled={isSaving}
           >
             {isSaving ? (
               <span className="loading loading-spinner"></span>
