@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type { FoodItem } from '@/types/meal';
 import { MealItemForm } from './MealItemForm';
 import { MealItemsTable } from './MealItemsTable';
@@ -22,7 +22,6 @@ export function AddMealModal({
   open,
   typeMeal,
   onClose,
-  //onSave,
   onMealCreated
 }: AddMealModalProps) {
   if(!typeMeal){
@@ -38,9 +37,19 @@ export function AddMealModal({
   });
 
   const [items, setItems] = useState<FoodItem[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
+  
+  const [feedback, setFeedback] = useState<{ type: 'error' | 'success', message: string } | null>(null);
+
+  useEffect(() => {
+    if (!open) {
+      setFeedback(null);
+    }
+  }, [open]);
 
   function handleAddItem(item: FoodItem) {
     setItems((current) => [...current, item]);
+    setFeedback(null);
   }
 
   function handleRemoveItem(item: FoodItem) {
@@ -48,22 +57,25 @@ export function AddMealModal({
   }
 
   async function handleSaveMeal() {
+    setFeedback(null);
+
     if (!meal.description || meal.description.trim() === '') {
-      alert("Por favor, preencha a descrição da refeição.");
+      setFeedback({ type: 'error', message: 'Por favor, preencha a descrição da refeição.' });
       return;
     }
 
     if (!meal.eatTime) {
-      alert("Por favor, informe a data e o horário da refeição.");
+      setFeedback({ type: 'error', message: 'Por favor, informe a data e o horário da refeição.' });
       return;
     }
 
     if (items.length === 0) {
-      alert("Por favor, adicione pelo menos um alimento à refeição antes de salvar.");
+      setFeedback({ type: 'error', message: 'Por favor, adicione pelo menos um alimento à refeição.' });
       return;
     }
 
     try {
+      setIsSaving(true);
       await createMeal({
         ...meal,
         items: items.map((item) => ({
@@ -74,17 +86,19 @@ export function AddMealModal({
 
       await onMealCreated();
 
-      setMeal({
-        description: '',
-        type: category.id,
-        eatTime: '',
-      });
-      setItems([]);
+      setFeedback({ type: 'success', message: 'Refeição cadastrada com sucesso!' });
+      
+      setTimeout(() => {
+        setMeal({ description: '', type: category.id, eatTime: '' });
+        setItems([]);
+        setIsSaving(false);
+        onClose();
+      }, 1500);
 
-      onClose();
     } catch (error) {
       console.error("Erro ao salvar refeição:", error);
-      alert("Ocorreu um erro ao salvar a refeição. Tente novamente.");
+      setFeedback({ type: 'error', message: 'Ocorreu um erro no servidor ao salvar a refeição. Tente novamente.' });
+      setIsSaving(false);
     }
   }
 
@@ -115,6 +129,12 @@ export function AddMealModal({
       <div className="modal-box max-w-6xl">
         <h2 className="text-3xl font-semibold mb-6">Adicionar Refeição</h2>
         
+        {feedback && (
+          <div className={`alert ${feedback.type === 'error' ? 'alert-error' : 'alert-success'} shadow-sm mb-6 rounded-lg`}>
+            <span>{feedback.message}</span>
+          </div>
+        )}
+
         <MealMacrosSummary macros={macros} />
         <MealMetadataForm meal={meal} setMeal={setMeal} />
 
@@ -126,13 +146,32 @@ export function AddMealModal({
         <MealItemsTable items={items} onRemove={handleRemoveItem} />
 
         <div className="modal-action">
-          <button type="button" className="btn btn-ghost" onClick={onClose}>
+          <button 
+            type="button" 
+            className="btn btn-ghost" 
+            onClick={onClose}
+            disabled={isSaving || feedback?.type === 'success'}
+          >
             Cancelar
           </button>
-          <button type="button" className="btn btn-primary" onClick={handleSaveMeal}>
-            Salvar refeição
+          
+          <button 
+            type="button" 
+            className="btn btn-primary" 
+            onClick={handleSaveMeal}
+            disabled={isSaving || feedback?.type === 'success'}
+          >
+            {isSaving ? (
+              <span className="loading loading-spinner"></span>
+            ) : (
+              'Salvar refeição'
+            )}
           </button>
         </div>
+      </div>
+      
+      <div className="modal-backdrop" onClick={() => !isSaving && onClose()}>
+        <button>Fechar</button>
       </div>
     </div>
   );
