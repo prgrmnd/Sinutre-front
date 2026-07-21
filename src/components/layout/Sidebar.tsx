@@ -4,6 +4,7 @@ import { NAV_ITEMS } from '@/constants/navigation';
 import { SidebarBrand } from './SidebarBrand';
 import { SidebarItem } from './SidebarItem';
 import { api } from '@/lib/api';
+import { useToast } from '@/context/ToastContext';
 
 interface SidebarProps {
   drawerId: string;
@@ -12,6 +13,7 @@ interface SidebarProps {
 export function Sidebar({ drawerId }: SidebarProps) {
   const expanded = true; 
   const navigate = useNavigate();
+  const { addToast } = useToast();
 
   const handleLogout = async () => {
     try {
@@ -20,13 +22,14 @@ export function Sidebar({ drawerId }: SidebarProps) {
       
       localStorage.removeItem('token');
 
+      addToast('success', 'Sessão encerrada com sucesso!');
       navigate('/login');
       
     } catch (error) {
 
       console.error('Erro ao comunicar logout ao backend:', error);
       
-      alert('Não foi possível encerrar a sessão corretamente. Tente novamente.');
+      addToast('error', 'Não foi possível encerrar a sessão corretamente. Tente novamente.');
     }
   };
 

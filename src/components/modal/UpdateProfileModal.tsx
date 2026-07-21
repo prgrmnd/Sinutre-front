@@ -1,5 +1,6 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { updateProfile } from '@/services/userService';
+import { useToast } from '@/context/ToastContext';
 
 interface UserProfile {
   height?: number | null;
@@ -14,12 +15,12 @@ interface UpdateProfileModalProps {
 }
 
 export function UpdateProfileModal({ isOpen, onClose, initialData }: UpdateProfileModalProps) {
+  const { addToast } = useToast();
   const [height, setHeight] = useState<string | number>('');
   const [weight, setWeight] = useState<string | number>('');
   const [targetCalories, setTargetCalories] = useState<string | number>('');
 
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen && initialData) {
@@ -30,7 +31,6 @@ export function UpdateProfileModal({ isOpen, onClose, initialData }: UpdateProfi
       setHeight('');
       setWeight('');
       setTargetCalories('');
-      setError(null);
     }
   }, [isOpen, initialData]);
 
@@ -39,7 +39,6 @@ export function UpdateProfileModal({ isOpen, onClose, initialData }: UpdateProfi
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError(null);
 
     const payload = {
       height: Number(height),
@@ -52,10 +51,11 @@ export function UpdateProfileModal({ isOpen, onClose, initialData }: UpdateProfi
       
       await updateProfile(payload);
       
+      addToast('success', 'Perfil físico atualizado com sucesso!');
       onClose();
     } catch (err) {
       console.error(err);
-      setError('Ocorreu um erro ao salvar os dados. Verifique as informações e tente novamente.');
+      addToast('error', 'Ocorreu um erro ao salvar os dados. Verifique as informações e tente novamente.');
     } finally {
       setIsLoading(false);
     }
@@ -66,12 +66,6 @@ export function UpdateProfileModal({ isOpen, onClose, initialData }: UpdateProfi
       <div className="modal-box bg-base-100">
         <h3 className="font-bold text-lg text-base-content mb-6">Atualizar Perfil Físico</h3>
         
-        {error && (
-          <div className="alert alert-error mb-4 rounded-lg p-3 text-sm">
-            <span>{error}</span>
-          </div>
-        )}
-
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           
           {/* Input Altura */}

@@ -7,13 +7,12 @@ import { MealMetadataForm } from './MealMetadataForm';
 import { MealCategory } from '@/types/meal';
 import { MEAL_CATEGORY_BY_ID } from '@/constants/mealCategories';
 import { createMeal } from '@/services/mealService';
-
+import { useToast } from '@/context/ToastContext';
 import { MealState } from '@/types/meal';
 
 interface AddMealModalProps {
   open: boolean;
   onClose: () => void;
-  onSave: () => void;
   typeMeal: MealCategory | null;
   onMealCreated: () => Promise<void>;
 }
@@ -22,15 +21,16 @@ export function AddMealModal({
   open,
   typeMeal,
   onClose,
-  //onSave,
   onMealCreated
 }: AddMealModalProps) {
-  if(!typeMeal){
-    return <></>
+  const { addToast } = useToast();
+
+  if (!typeMeal) {
+    return <></>;
   }
 
   const category = MEAL_CATEGORY_BY_ID[typeMeal];
-  
+
   const [meal, setMeal] = useState<MealState>({
     description: '',
     type: category.id,
@@ -38,6 +38,7 @@ export function AddMealModal({
   });
 
   const [items, setItems] = useState<FoodItem[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
 
   function handleAddItem(item: FoodItem) {
     setItems((current) => [...current, item]);
@@ -49,21 +50,22 @@ export function AddMealModal({
 
   async function handleSaveMeal() {
     if (!meal.description || meal.description.trim() === '') {
-      alert("Por favor, preencha a descrição da refeição.");
+      addToast('error', 'Por favor, preencha a descrição da refeição.');
       return;
     }
 
     if (!meal.eatTime) {
-      alert("Por favor, informe a data e o horário da refeição.");
+      addToast('error', 'Por favor, informe a data e o horário da refeição.');
       return;
     }
 
     if (items.length === 0) {
-      alert("Por favor, adicione pelo menos um alimento à refeição antes de salvar.");
+      addToast('error', 'Por favor, adicione pelo menos um alimento à refeição.');
       return;
     }
 
     try {
+      setIsSaving(true);
       await createMeal({
         ...meal,
         items: items.map((item) => ({
@@ -74,17 +76,17 @@ export function AddMealModal({
 
       await onMealCreated();
 
-      setMeal({
-        description: '',
-        type: category.id,
-        eatTime: '',
-      });
+      addToast('success', 'Refeição cadastrada com sucesso!');
+      
+      setMeal({ description: '', type: category.id, eatTime: '' });
       setItems([]);
-
       onClose();
+
     } catch (error) {
       console.error("Erro ao salvar refeição:", error);
-      alert("Ocorreu um erro ao salvar a refeição. Tente novamente.");
+      addToast('error', 'Ocorreu um erro no servidor ao salvar a refeição. Tente novamente.');
+    } finally {
+      setIsSaving(false);
     }
   }
 
@@ -114,7 +116,7 @@ export function AddMealModal({
     <div className={`modal ${open ? 'modal-open' : ''}`} role="dialog">
       <div className="modal-box max-w-6xl">
         <h2 className="text-3xl font-semibold mb-6">Adicionar Refeição</h2>
-        
+
         <MealMacrosSummary macros={macros} />
         <MealMetadataForm meal={meal} setMeal={setMeal} />
 
@@ -126,13 +128,32 @@ export function AddMealModal({
         <MealItemsTable items={items} onRemove={handleRemoveItem} />
 
         <div className="modal-action">
-          <button type="button" className="btn btn-ghost" onClick={onClose}>
+          <button 
+            type="button" 
+            className="btn btn-ghost" 
+            onClick={onClose}
+            disabled={isSaving}
+          >
             Cancelar
           </button>
-          <button type="button" className="btn btn-primary" onClick={handleSaveMeal}>
-            Salvar refeição
+          
+          <button 
+            type="button" 
+            className="btn btn-primary" 
+            onClick={handleSaveMeal}
+            disabled={isSaving}
+          >
+            {isSaving ? (
+              <span className="loading loading-spinner"></span>
+            ) : (
+              'Salvar refeição'
+            )}
           </button>
         </div>
+      </div>
+      
+      <div className="modal-backdrop" onClick={() => !isSaving && onClose()}>
+        <button>Fechar</button>
       </div>
     </div>
   );

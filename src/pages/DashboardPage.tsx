@@ -13,6 +13,7 @@ import { Meal } from '@/types/mealSummary';
 import { api } from '@/lib/api';
 import { useMealModal } from '@/hooks/useMealModal';
 import { WarningCircle } from '@phosphor-icons/react';
+import { useToast } from '@/context/ToastContext';
 
 interface DashboardPageProps {
   drawerId: string;
@@ -20,6 +21,7 @@ interface DashboardPageProps {
 
 export function DashboardPage({ drawerId }: DashboardPageProps) {
   const { user } = useAuth();
+  const { addToast } = useToast();
 
   if (!user) {
     return <></>;
@@ -81,9 +83,10 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
     try {
       await api.delete(`/meals/${meal.id}`);
       await handleMealCreated(); 
+      addToast('success', 'Refeição excluída com sucesso!');
     } catch (error) {
       console.error('Erro ao excluir refeição:', error);
-      alert('Erro ao excluir a refeição. Tente novamente.');
+      addToast('error', 'Erro ao excluir a refeição. Tente novamente.');
     }
   }
 
