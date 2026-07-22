@@ -1,12 +1,6 @@
 import type { ReactNode } from 'react';
-import { GithubLogo } from '@phosphor-icons/react';
+import { GithubLogo, Sparkle } from '@phosphor-icons/react';
 import { API_URL } from '@/lib/api';
-
-// Cores extraídas do SVG do protótipo
-const GREEN = '#00C68F';
-const BG = '#FBFBFB';
-const TEXT_DARK = '#1F2937';
-const TEXT_MUTED = '#727272';
 
 function startGithubLogin() {
   window.location.href = `${API_URL}/auth/github`;
@@ -14,127 +8,85 @@ function startGithubLogin() {
 
 export function LoginPage() {
   return (
-    <>
-      {/* ============================= Desktop ============================= */}
-      <div
-        className="hidden md:block relative min-h-screen w-full overflow-hidden"
-        style={{ backgroundColor: BG }}
-      >
-        {/* Painel verde (≈28% da largura, do protótipo) */}
-        <div
-          className="absolute inset-y-0 left-0 w-[28%]"
-          style={{ backgroundColor: GREEN }}
-        />
+    <div className="min-h-screen w-full flex flex-col md:flex-row antialiased bg-base-100 text-base-content selection:bg-primary selection:text-primary-content">
+      <div className="relative w-full md:w-[48%] lg:w-[45%] bg-primary text-primary-content p-8 lg:p-12 flex flex-col justify-between overflow-hidden shadow-2xl">
+        
+        <div className="absolute -top-24 -left-24 w-96 h-96 bg-base-100/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-neutral/10 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Marca SiNutre — topo da área branca, alinhada à esquerda (logo após o painel verde) */}
-        <h1
-          className="absolute top-10 left-[30%] lg:top-12 z-20 text-5xl lg:text-6xl font-extrabold tracking-tight"
-          style={{ color: GREEN }}
-        >
-          SiNutre
-        </h1>
-
-        {/* Prato com pílulas — sobrepõe a borda verde/branca (vai de 0% a ≈44%) */}
-        <div
-          className="absolute z-10 left-0 -translate-y-1/2"
-          style={{ top: '57%', width: '44%' }}
-        >
-          <div className="relative aspect-[596/419]">
-            <img
-              src="/plate.png"
-              alt="Prato com vitaminas, proteínas, carboidratos e gorduras"
-              className="absolute inset-0 w-full h-full object-contain"
-            />
-            <Pill className="top-[19%] left-[22%] -translate-x-1/2 -translate-y-1/2">
-              Vitaminas
-            </Pill>
-            <Pill className="top-[19%] left-[83%] -translate-x-1/2 -translate-y-1/2">
-              Proteínas
-            </Pill>
-            <Pill className="top-[78%] left-[19%] -translate-x-1/2 -translate-y-1/2">
-              Carboidratos
-            </Pill>
-            <Pill className="top-[82%] left-[81%] -translate-x-1/2 -translate-y-1/2">
-              Gorduras
-            </Pill>
+        <div className="relative z-10 flex items-center gap-2">
+          <div className="w-10 h-10 rounded-box bg-base-100/20 backdrop-blur-md flex items-center justify-center border border-base-100/30 text-primary-content font-extrabold text-xl shadow-inner">
+            S
           </div>
-        </div>
-
-        {/* Conteúdo direito */}
-        <div className="absolute inset-y-0 left-[44%] right-0 z-20 flex items-center justify-center px-6">
-          <WelcomeBlock />
-        </div>
-      </div>
-
-      {/* ============================= Mobile ============================= */}
-      <div
-        className="md:hidden min-h-screen flex flex-col"
-        style={{ backgroundColor: BG }}
-      >
-        <header
-          className="text-white px-6 pt-10 pb-8 flex flex-col items-center"
-          style={{ backgroundColor: GREEN }}
-        >
-          <div className="relative w-[85%] max-w-sm aspect-[596/419]">
-            <img
-              src="/plate.png"
-              alt=""
-              className="absolute inset-0 w-full h-full object-contain"
-            />
-            <Pill className="top-[19%] left-[22%] -translate-x-1/2 -translate-y-1/2 text-xs px-3 py-1">
-              Vitaminas
-            </Pill>
-            <Pill className="top-[19%] left-[83%] -translate-x-1/2 -translate-y-1/2 text-xs px-3 py-1">
-              Proteínas
-            </Pill>
-            <Pill className="top-[78%] left-[19%] -translate-x-1/2 -translate-y-1/2 text-xs px-3 py-1">
-              Carboidratos
-            </Pill>
-            <Pill className="top-[82%] left-[81%] -translate-x-1/2 -translate-y-1/2 text-xs px-3 py-1">
-              Gorduras
-            </Pill>
-          </div>
-        </header>
-
-        <main className="flex-1 flex flex-col px-6 py-8">
-          <h1
-            className="text-4xl font-extrabold tracking-tight mb-8"
-            style={{ color: GREEN }}
-          >
+          <span className="text-3xl font-black tracking-tight drop-shadow-sm">
             SiNutre
-          </h1>
-          <div className="flex-1 flex items-center justify-center">
-            <WelcomeBlock />
-          </div>
-        </main>
-      </div>
-    </>
-  );
-}
+          </span>
+        </div>
 
-function WelcomeBlock() {
-  return (
-    <div className="flex flex-col items-center gap-6 text-center max-w-sm w-full">
-      <h2
-        className="text-4xl lg:text-5xl font-bold"
-        style={{ color: GREEN }}
-      >
-        Bem-vindo(a)!
-      </h2>
-      <p className="text-base lg:text-lg" style={{ color: TEXT_MUTED }}>
-        Faça login com seu Github
-        <br />
-        para começar.
-      </p>
-      <button
-        type="button"
-        onClick={startGithubLogin}
-        className="inline-flex items-center gap-2.5 rounded-xl px-6 py-3 text-white font-medium shadow-md transition-colors cursor-pointer"
-        style={{ backgroundColor: TEXT_DARK }}
-      >
-        <GithubLogo size={22} weight="fill" />
-        Entrar com Github
-      </button>
+        <div className="relative z-10 my-auto py-8 flex flex-col items-center justify-center">
+          <div className="relative w-full max-w-[420px] aspect-[596/419] transition-transform duration-500 hover:scale-[1.02]">
+            <img
+              src="/plate.png"
+              alt="Prato nutritivo com balanço de macros"
+              className="w-full h-full object-contain filter drop-shadow-2xl"
+            />
+            
+            <Pill className="top-[12%] left-[18%]">
+              Vitaminas
+            </Pill>
+            <Pill className="top-[12%] left-[82%]">
+              Proteínas
+            </Pill>
+            <Pill className="top-[80%] left-[15%]">
+              Carboidratos
+            </Pill>
+            <Pill className="top-[84%] left-[83%]">
+              Gorduras
+            </Pill>
+          </div>
+        </div>
+
+        <div className="relative z-10 hidden md:flex items-center justify-between text-primary-content/90 text-xs tracking-wide">
+          <span className="flex items-center gap-1.5 font-medium">
+            <Sparkle size={14} weight="fill" /> 
+            Nutrição Inteligente
+          </span>
+          <span>© {new Date().getFullYear()} SiNutre</span>
+        </div>
+      </div>
+
+      <div className="flex-1 flex flex-col justify-center items-center p-6 md:p-12 lg:p-16 relative">
+        <div className="w-full max-w-md flex flex-col items-center text-center">
+          
+          <div className="inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-6">
+            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+              Plataforma para Nutricionistas
+            </span>
+          </div>
+
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-base-content tracking-tight leading-tight mb-3">
+            Sua saúde sob <br className="hidden md:block" />
+            <span className="text-primary">medida e controle.</span>
+          </h1>
+
+          <p className="text-base text-base-content/70 mb-8 max-w-sm leading-relaxed mx-auto">
+            Acesse seu painel para gerenciar suas dietas, refeições e métricas com praticidade.
+          </p>
+
+          <div className="w-full bg-base-100 p-6 md:p-8 rounded-box border border-base-200 shadow-[0_10px_30px_rgba(0,0,0,0.04)]">
+            <button
+              type="button"
+              onClick={startGithubLogin}
+              className="btn btn-neutral btn-block h-14 rounded-box shadow-lg group hover:scale-[1.02] transition-transform duration-200"
+            >
+              <GithubLogo size={22} weight="fill" className="transition-transform group-hover:scale-110 text-neutral-content" />
+              <span className="text-neutral-content font-semibold">Entrar com GitHub</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
     </div>
   );
 }
@@ -148,8 +100,7 @@ function Pill({
 }) {
   return (
     <span
-      className={`absolute bg-white font-medium rounded-2xl shadow-[0_4px_14px_rgba(0,0,0,0.08)] px-5 py-2 text-sm whitespace-nowrap ${className}`}
-      style={{ color: TEXT_DARK }}
+      className={`absolute -translate-x-1/2 -translate-y-1/2 bg-base-100/90 backdrop-blur-md text-base-content font-bold rounded-full shadow-lg border border-base-200 px-3.5 py-1.5 md:px-4 md:py-1.5 text-xs md:text-sm whitespace-nowrap transition-transform duration-300 hover:scale-110 ${className}`}
     >
       {children}
     </span>
