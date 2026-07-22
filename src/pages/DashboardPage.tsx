@@ -195,7 +195,6 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
         open={modal.open}
         typeMeal={modal.selectedCategory}
         onClose={modal.close}
-        onSave={modal.close}
         onMealCreated={handleMealCreated}
       />
 
