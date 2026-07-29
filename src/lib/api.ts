@@ -39,7 +39,9 @@ export async function apiFetch<T>(
   if (!res.ok) {
     if (res.status === 401) {
       clearToken();
-      window.location.href = '/login';
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
     }
 
     const text = await res.text();
@@ -63,8 +65,11 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      clearToken(); 
-      window.location.href = '/login'; 
+      clearToken(); // Apaga o token vencido
+      
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
