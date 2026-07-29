@@ -22,8 +22,6 @@ export function clearToken(): void {
   localStorage.removeItem(TOKEN_KEY);
 }
 
-// Envia uma requisição JSON ao backend já com Bearer token (se houver).
-// Joga em caso de status != 2xx.
 export async function apiFetch<T>(
   path: string,
   init: RequestInit = {},
@@ -39,6 +37,11 @@ export async function apiFetch<T>(
   });
 
   if (!res.ok) {
+    if (res.status === 401) {
+      clearToken();
+      window.location.href = '/login';
+    }
+
     const text = await res.text();
     throw new Error(`${res.status} ${res.statusText}: ${text}`);
   }
@@ -46,15 +49,23 @@ export async function apiFetch<T>(
   return res.json() as Promise<T>;
 }
 
-
-
 api.interceptors.request.use((config) => {
   const token = getToken();
 
   if (token) {
-    config.headers.Authorization =
-      `Bearer ${token}`;
+    config.headers.Authorization = `Bearer ${token}`;
   }
 
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      clearToken(); 
+      window.location.href = '/login'; 
+    }
+    return Promise.reject(error);
+  }
+);

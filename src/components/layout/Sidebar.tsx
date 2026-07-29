@@ -3,7 +3,7 @@ import { SignOut } from '@phosphor-icons/react';
 import { NAV_ITEMS } from '@/constants/navigation';
 import { SidebarBrand } from './SidebarBrand';
 import { SidebarItem } from './SidebarItem';
-import { api } from '@/lib/api';
+import { api, clearToken } from '@/lib/api'; // Importamos o clearToken
 import { useToast } from '@/context/ToastContext';
 
 interface SidebarProps {
@@ -19,17 +19,12 @@ export function Sidebar({ drawerId }: SidebarProps) {
     try {
       await api.post('/auth/logout'); 
       console.log('Sessão encerrada no backend com sucesso!');
-      
-      localStorage.removeItem('token');
-
+    } catch (error) {
+      console.warn('O backend já não reconhecia a sessão.');
+    } finally {
+      clearToken(); 
       addToast('success', 'Sessão encerrada com sucesso!');
       navigate('/login');
-      
-    } catch (error) {
-
-      console.error('Erro ao comunicar logout ao backend:', error);
-      
-      addToast('error', 'Não foi possível encerrar a sessão corretamente. Tente novamente.');
     }
   };
 
