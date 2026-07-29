@@ -4,26 +4,23 @@
 
 > Projeto final desenvolvido para a Formação em Desenvolvimento Web Moderno. O objetivo principal foi aplicar melhorias no MVP do Sinutre, implementando novas funcionalidades no frontend e backend fornecidos.
 
-## Links de Produção (Obrigatório)
-*   **Frontend (Vercel):** [Insira seu link do Vercel aqui]
-*   **Backend (Railway):** [Insira seu link do Railway aqui]
+## Links de Produção
+*   **Frontend (Vercel):** https://sinutre-front.vercel.app
+*   **Backend (Railway):** https://sinutre-back-production.up.railway.app
 
-## Repositórios (Obrigatório)
-*   **Repositório Frontend:** [Insira o link público do seu repositório frontend]
-*   **Repositório Backend:** [Insira o link público do seu repositório backend]
+## Repositórios
+*   **Repositório Frontend:** https://github.com/prgrmnd/Sinutre-front
+*   **Repositório Backend:** https://github.com/prgrmnd/Sinutre-back
 
 ---
 
 ## Demonstração da Aplicação
 
-*(Adicione aqui screenshots ou GIFs das páginas que você desenvolveu, especialmente a nova interface e dashboard)*
-
 | Login Modernizado | Dashboard / Métricas | Página de Alimentos |
 | :---: | :---: | :---: |
-| ![Login](URL_DA_IMAGEM) | ![Dashboard](URL_DA_IMAGEM) | ![Alimentos](URL_DA_IMAGEM) |
-
----
-
+| ![Login](https://imgur.com/zRs1hqH.png) | ![Dashboard](https://imgur.com/EYzcwvK.png) | ![Alimentos](https://imgur.com/ifLHsG9.png) |
+| **Progresso** | **Configurações** | **Inserção de Alimentação** |
+| ![Progresso](https://imgur.com/yMfMthn.png) | ![Configurações](https://imgur.com/BSE5UBT.png) | ![Inserção de Refeição](https://imgur.com/c0VHPLV.png) |
 ## Requisitos Desenvolvidos
 
 Conforme exigido pelas regras do projeto, abaixo estão listadas todas as funcionalidades implementadas neste repositório.
